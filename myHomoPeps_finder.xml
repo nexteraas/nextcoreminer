@@ -1,0 +1,27 @@
+
+<tool id="myHomoPeps_finder" name="Homology to Known Epitopes Finder" version="0.1.0" python_template_version="3.5">
+    <requirements>
+	<requirement type="package" version="3">python</requirement>
+    </requirements>
+   
+    <command detect_errors="exit_code"><![CDATA[
+    	python3 '$__tool_directory__/myHomoPeps.py' -f1 $input1 -f2 ${" ".join(map(str,$input2  ))}  -l $pepLength -epi $epi -identity $identity  
+    ]]></command> 
+    
+<inputs>
+	<param type="data" format = "txt" name="input1" label="Background file to make blast database:"/>
+	<param type="data" format = "txt" name="input2" label="Peptide list:" multiple="True"/>
+	<param name="pepLength" type="integer" size="15" value="11" label="Set length of peptides" />
+	<param name="epi" type="text" value="" label="Insert your epitope" />
+	<param name="identity" type="text" value="10" label="Blast % identity cut-off for homology" help="Evalue cutoff was set 10000"/> 
+</inputs>    
+
+<outputs>
+
+	<data name="output" format="txt" from_work_dir="myHomoPeps.txt"  label="HomoPeptides"/>	
+</outputs>
+
+    <help><![CDATA[
+        TODO: Fill in help.
+    ]]></help>
+</tool>

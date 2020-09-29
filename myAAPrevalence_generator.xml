@@ -1,0 +1,77 @@
+
+<tool id="myAAPrevalence_generator" name="Amino Acids Prevalence" version="0.1.0" python_template_version="3.5">
+    <requirements>
+	<requirement type="package" version="3">python</requirement>
+    </requirements>
+   
+    <command detect_errors="exit_code"><![CDATA[
+	    python3 '$__tool_directory__/myAAPrevalence.py' 
+	    -f #for $q in $series# '${q.input}' #end for#
+	    -titles #for $q in $series# '${q.titles}' #end for#
+	    -colors 
+	    #for $q in $series# 
+	    	#if $q.colorSelect.colors=="other"
+		  $q.colorSelect.color_other
+		#else
+	    	  ${q.colorSelect.colors} 
+		#end if
+
+	    #end for#	    
+	    
+	    -optionScale $optionScale
+
+	    -optionOut   $optionOut.optionPosOut
+	    #if $optionOut.optionPosOut=="yes"
+	        -pos '$optionOut.pos'
+	    #end if
+
+    ]]></command> 
+    
+<inputs>
+		<repeat name="series" title="Peptides files (max. 9)">
+    		<param name="input" type="data" format="txt" label="Dataset" help="The input can be a matrix file, but the 1st column should be peptides"/>
+		<param name="titles" type="text" data_ref="input" label="Name of the dataset"/>
+		<conditional name="colorSelect">
+	 	   <param name="colors" type="select" data_ref="input" label="Color of the dataset" help="Note: valid colors can find at: https://matplotlib.org/tutorials/colors/colormaps.html">
+			<option value="Greys">Greys</option>
+			<option value="Blues">Blues</option>
+			<option value="Reds">Reds</option>
+			<option value="Greens">Greens</option>
+			<option value="Oranges">Oranges</option>
+			<option value="Purples">Purples</option>
+			<option value="PuBu">PuBu</option>
+			<option value="BuGn">BuGn</option>
+			<option value="RdPu">RdPu</option>
+			<option value="other">Other</option>
+
+		   </param>
+		   <when value="other">
+			   <param name="color_other" type="text" label="Other non listed colors"/>
+		   </when>
+		</conditional>
+		</repeat>
+		
+		<param name="optionScale" type="select" display="radio" label="Do you want to scale AA prevalences by read counts?" >
+			<option value="no"> No</option>
+			<option value="yes"> Yes</option>
+		</param>	
+		<conditional name="optionOut">
+			<param name="optionPosOut" type="select" display="radio" label="Do you want to ignore some positions?">
+				<option value="no"> No</option>
+				<option value="yes"> Yes</option>
+			</param>
+			<when value="yes">	
+				<param name="pos" type="text" value="" label="Please set your positions below" help="Note: position is written with whitespace, comma or semicolon as delimiters (all 3 or a mix of them work). e.g. 2;, 5,7;10 will be treated as 2,5,7,10"  />
+			</when>
+		</conditional>	
+	</inputs>    
+
+<outputs>
+	<data name="output1" format="txt" from_work_dir="AAPrevalenceCounts.txt" label="Amino Acid Prevalence Counts Matrix"/>
+	<data name="output2" format="pdf" from_work_dir="AAPrevalencePlot.pdf"  label="Amino Acid Prevalence Heatmap"/>	
+</outputs>
+
+    <help><![CDATA[
+        TODO: Fill in help.
+    ]]></help>
+</tool>

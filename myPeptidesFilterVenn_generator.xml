@@ -1,0 +1,113 @@
+<tool id="myPeptidesFilterVenn_generator" name="Peptides Filter and Venn Generator" version="0.1.0" python_template_version="3.5">
+    <requirements>
+	<requirement type="package" version="3">python</requirement>
+    </requirements>
+    <command detect_errors="exit_code"><![CDATA[
+	    python3 '$__tool_directory__/myPeptidesFilterVenn.py' -f ${" ".join(map(str,$PepList  ))} -g ${" ".join(map(str,$groups  ))} -filterFreq $filterFreq 
+
+	    -filterCounts $Counts.filterCounts
+	    #if $Counts.filterCounts=="yes":
+	    	-c $Counts.counts	
+	    #end if
+
+	    -filterHomo $Homology.filterHomo
+	
+
+	    #if $Homology.filterHomo=="yes":
+	    	-epi $Homology.epi -o $Homology.OptionIdenSim.option -op $Homology.op -ep $Homology.ep
+		#if $Homology.OptionIdenSim.option=="Identity":
+			-threshold '$Homology.OptionIdenSim.identity'
+			-n '$Homology.OptionIdenSim.num_overlap'
+		#else:
+		-threshold '$Homology.OptionIdenSim.similarity'
+			-n '$Homology.OptionIdenSim.num_overlap'
+		#end if
+	    #end if
+    
+	
+	    -filterNegCells $NegCellsFilter.filterNegCells
+	    
+	    #if $NegCellsFilter.filterNegCells=="yes"
+	    	 -negCells ${" ".join(map(str,$NegCellsFilter.negCells  ))}
+	    	-negCellsCounts $NegCellsFilter.negCellsCounts
+	    #end if
+	
+	    
+
+	 ]]></command>
+
+
+    <inputs>
+	    <param type="data"   name="PepList" label="Please upload the whole NNK library with peptides from different rounds and cell types"  multiple="True"  />
+	<param name="groups" type="text" label="Groups for venn diagram"  multiple="true" help="e.g. R2_R12C9 R2_R12C9mut4 R2_6F9 R2_380 R1_R12C9 R1_R12C9mut4 R1_6F9 R1_380"  />
+	<param type="select" name="filterFreq" display="radio" label="Do you want to keep only the peptides with frequency increasing with the selection rounds (i.e. R2_freq >= R1_freq)?">
+		<option value="no" > No</option>
+		<option value="yes" > Yes</option>
+	</param>
+
+	<conditional name="Counts">
+		<param type="select" name="filterCounts" display="radio" label="Do you want to keep only the peptides with counts higher than e.g. 1 ?" >
+			 <option value="no" > No</option>
+		 	 <option value="yes" > Yes</option>
+		</param>
+       		<when value="yes">
+			<param name="counts" type="text" value="1" label="Insert your number:"/>
+		</when>		
+	
+	</conditional>
+
+	<conditional name="Homology">
+		<param type="select" name="filterHomo" display="radio" label="Do you want to keep only the peptides sharing homology with your epitope?"   >
+			<option value="no" > No</option>
+			<option value="yes" > Yes</option>
+		</param>
+       		<when value="yes">
+			<param name="epi" type="text" value="KLLTQHFVQENY" label="Insert your epitope:" help="e.g. KLLTQHFVQENY. Scoring matrix of fasta36 is BLOSUM62"/>
+			<param name="op" type="text" value="100" label="Insert your gap opening penalty"/>
+			<param name="ep" type="text" value="0.5" label="Insert your gap extension penalty"/>
+			<conditional name="OptionIdenSim">
+				<param type="select" name="option" display="radio" label="Do you want to use % identity or % similarity for the homology measurement?" >
+					<option value="Identity"> Identity</option>
+					<option value="Similarity"> Similarity</option>
+				</param>
+				<when value="Identity">
+					<param name="identity" type="text" value="80" label="% identity cut-off for homology:" />
+					<param name="num_overlap" type="text" value="1" label="Set the minimum number of overlap AAs for the alignment:"/>
+
+				</when>
+				<when value="Similarity">
+					<param name="similarity" type="text" value="80" label="% similarity cut-off for homology:" />
+					<param name="num_overlap" type="text" value="1" label="Set the minimum number of overlap AAs for the alignment:"/>
+
+				</when>
+			</conditional>
+		</when>
+
+	</conditional>
+
+
+	<conditional name="NegCellsFilter">
+                <param type="select" name="filterNegCells" display="radio" label="Do you want to keep only the peptides which do not appear in the negative cell types?"  >
+                        <option value="no" > No</option>
+                        <option value="yes" > Yes</option>
+		</param>
+
+		<when value="yes">
+			<param name="negCells" type="text" multiple="True" label="Insert your negative cell types:" help="e.g. R1_380 R2_380"/>
+			<param name="negCellsCounts" type="text" value="0" label="Insert the counts threshold in negative cell types:" help="Note: peptides with counts higher than a certain number in the negative cells will be removed. i.e. 0 indicates all the peptides that appear in the negative cells will be removed. 1 indicates peptides that appear in the negative cells, and counts are higher than 1 wil be removed." />
+		</when>
+
+	</conditional>
+
+
+    </inputs>
+    <outputs>
+	<data name="output1" format="txt" from_work_dir="peptide_matrix.txt"  label="Peptide Matrix"/>
+	<data name="output2" format="txt" from_work_dir="FilterLog.txt"  label="Filter log file"/>
+	<data name="output3" format="pdf" from_work_dir="venn.pdf" label="Venn Diagram"/>
+
+    </outputs>
+    <help><![CDATA[
+        TODO: Fill in help.
+    ]]></help>
+</tool>

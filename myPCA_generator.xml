@@ -1,0 +1,75 @@
+
+<tool id="myPCA_generator" name="PCA Generator" version="0.1.0" python_template_version="3.5">
+    <requirements>
+	<requirement type="package" version="3">python</requirement>
+    </requirements>
+   
+    <command detect_errors="exit_code"><![CDATA[
+	    python3 '$__tool_directory__/myPCA_UMap_Louvain.py' -f '$input'  -b $blosum  -o $option -tsne $tsne  -colorClass $colorClass
+	    
+	    -wOption $WeightOption.wOption
+	    #if $WeightOption.wOption=="yes":
+	    	-w '$WeightOption.weight' 
+	    #end if
+    ]]></command> 
+<!--	<code file="dynamic_options.py" />  -->
+    
+<inputs>
+	<param type="data" format = "txt" name="input" label="Matrix file from Venn:"/>
+
+	<param name="colorClass" type="select" display="radio" label="PCA UMAP (tSNE) should be colored by:" > 
+		<option value="groups"> Groups </option>
+		<option value="rounds"> Rounds </option>
+		<option value="cellTypes"> Cell Types </option>
+	</param>
+
+
+	<param type="select" name="blosum" display="radio" label="Plsease select blosum matrix:">
+		<option value="/opt/nextera/galaxy/data/custom/BLOSUM62.txt"> Blosum 62</option>
+		<option value="/opt/nextera/galaxy/data/custom/blosum62_freq.txt"> Blosum 62 frequency</option>
+	</param>
+	<param name="tsne" type="select" display="radio" label="TSNE option: ">
+		<option value="0"> No TSNE plot</option>
+		<option value="1"> TSNE will be generated. Warning: it may take up to 10 mins</option>	
+	</param>
+	<param name="option" type="select" display="radio" label="Matrix option:">
+		<option value="1"> No weight, original Blosum matrix</option>
+		<option value="2"> Peptide frequency used as weight</option>
+		<option value="3"> Peptide frequency used as an additional feature</option>
+	</param>
+
+
+
+	<conditional name="WeightOption">
+                <param name="wOption" type="select" display="radio" label="Do you want to set weight for each position?">
+                        <option value="no"> No</option>
+                        <option value="yes"> Yes</option>
+                </param>
+                <when value="yes">
+			<param name="weight" type="text" value="" label="Please set your weight below:" help="Note:Weight for each position is written with whitespace, comma or semicolon as delimiters (all 3 or a mix of them work). e.g. 0.7 0.8 1,0.9;0.3 0 0.2 1 0.1;;0.5  0.9 0.7;;; will be treated as 0.7,0.8,1,0.9,0.3,0,0.2,1,0.1,0.5,0.9,0.7"  />
+                </when>
+   	 </conditional>
+
+</inputs>    
+
+<outputs>
+	<collection name="output1" type="list" label="PCA UMAP Louvain">
+		<discover_datasets pattern="(?P&lt;designation&gt;.+)\.pdf" ext="pdf" directory="figures_PCA_UMap_Louvain" visible="false"  />
+	</collection>
+	
+	<collection name="output2" type="list"  label="Louvain clusters pep logo">
+		<discover_datasets pattern="(?P&lt;designation&gt;.+)\.pdf" ext="pdf" directory="Louvain_Clusters"  visible="false"  />
+	</collection>
+
+	<collection name="output3" type="list"  label="Louvain clusters pep list">
+		<discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt" ext="txt" directory="Louvain_Clusters"  visible="false"  />
+	</collection>
+
+	<data name="output4" format="txt" from_work_dir="sum.txt"  label="Cluster stats TXT"/>	
+	<data name="output5" format="json" from_work_dir="sum.json" label="Cluster stats JSON"/>
+</outputs>
+
+    <help><![CDATA[
+        TODO: Fill in help.
+    ]]></help>
+</tool>

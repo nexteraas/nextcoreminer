@@ -1,0 +1,32 @@
+<tool id="merge_matrix_1" name="Complie Results Matrix" version="0.1.0" python_template_version="3.5">
+   <description>Take peptide outputs and merge ontop matrix</description>
+    <requirements>
+    
+   </requirements>
+    <command detect_errors="exit_code"><![CDATA[
+	    python3 '$__tool_directory__/data_run_colllector.py' 
+	    -d ${" ".join(map(str,$datain))}
+	    -p $processes
+	    -t '/opt/nextera/galaxy/nextera-peptide-viewer/'
+
+    ]]></command>
+    <inputs>
+	<param type="data"  name="datain" multiple="true"  label="files to merge" help="peptide values to compile into unique table"/>
+	<param type="select" name="processes" >
+		<option value="4">4</option>
+	</param>
+    </inputs>
+    <outputs>
+	    <data name="htmlmatrix" format="html" from_work_dir="hyperlink.html" label="Sortable Peptide table on ${on_string}"/> 
+	    <!-- a<collection type="list" label="Sortable Peptide table on ${on_string}" name="output1">
+		    <data name="lochtml" format="html" from_work_dir="data_display.html" label="Sortable Peptide table on ${on_string}"/> 
+		    <data name="locjs" format="txt" from_work_dir="script.js"  hidden="true"/>
+		<data name="locjason" format="json" from_work_dir="data_table.jsonp" hidden="true"/>
+		<data name="locr0" format="json" from_work_dir="R0_data_table.jsonp" hidden="true"/>-->
+		<!--</collection>-->
+	</outputs>
+    
+	<help><![CDATA[
+        TODO: Fill in help.
+    ]]></help>
+</tool>

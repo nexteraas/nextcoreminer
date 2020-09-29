@@ -1,0 +1,45 @@
+
+<tool id="myPsiBlast_generator" name="PSI-BLAST searching for databases" version="0.1.0" python_template_version="3.5">
+    <requirements>
+	<requirement type="package" version="3">python</requirement>
+    </requirements>
+   
+    <command detect_errors="exit_code"><![CDATA[
+	    python3 '$__tool_directory__/myPsiBlast.py' -f '$input' -db $db -evalue $evalue -op $op -ep $ep -num $num -o $option 
+	    
+	
+
+    ]]></command> 
+    
+<inputs>
+	<param type="data" format = "txt" name="input" label="Mafft alignment file:" help="The input should be the  multiple sequence alignment file, or PSI-BLAST checkpoint file"/>
+	
+	<param type="select" name="option" display="radio" label="Please select your input data type">
+		<option value="msa"> Multiple sequence alignment</option>
+		<option value="pssm"> PSI-BLAST checkpoint file</option>
+	</param>
+	<param type="select" name="db" display="radio" label="Please select your protein database:">
+             <option value="uniprot_sprot"> UniProtKB/SwissProt</option>
+	     <option value="uniprot_trembl.fasta"> TrEMBL</option>
+	     <option value="nr"> Non-redundant protein sequences (nr)</option>
+	     <option value="EL" > Eluted ligand data</option>
+     	</param>
+	<param name="op" type="text" value="32767" label="Please set your gap opening penalty value:"/>
+	<param name="ep" type="text" value="32767" label="Please set your gap extension penalty value:"/>
+	<param name="num" type="text" value="1" label="Please set your number of iterations to perform:" help="Note: 0 means run until convergence"/>
+
+	<param name="evalue" type="text" value="1" label="Insert your evalue cut-off:"/>
+
+</inputs>    
+
+<outputs>
+	<data name="output1" format="txt" from_work_dir="myPsiBlast.out.txt"  label="PsiBlast output"/>
+	<data name="output2" format="txt" from_work_dir="myPsiblast.pssm.checkpoint.txt"  label="PsiBlast pssm checkpoint file"/>
+	<data name="output3" format="txt" from_work_dir="myPsiblast.pssm.matrix.txt"  label="PsiBlast pssm matrix file"/>
+
+</outputs>
+
+    <help><![CDATA[
+        TODO: Fill in help.
+    ]]></help>
+</tool>

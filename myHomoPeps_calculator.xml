@@ -1,0 +1,52 @@
+
+<tool id="myHomoPeps_calculator" name="Homology Calculator" version="0.1.0" python_template_version="3.5">
+    <requirements>
+	<requirement type="package" version="3">python</requirement>
+    </requirements>
+   
+    <command detect_errors="exit_code"><![CDATA[
+	    python3 '$__tool_directory__/myHomoPeps.py' -f '$input' -epi $epi  -o $OptionIdenSim.option 
+	    
+	    #if $OptionIdenSim.option=="Identity":
+		 -threshold '$OptionIdenSim.identity'
+		 -n '$OptionIdenSim.num_overlap'
+	    #else:
+	    	-threshold '$OptionIdenSim.similarity'
+		-n '$OptionIdenSim.num_overlap'
+	    #end if
+	
+
+    ]]></command> 
+    
+<inputs>
+	<param type="data" format = "txt" name="input" label="Peptide list:" help="The input can be a matrix file, but the 1st column should be peptides"/>
+	<param name="epi" type="text" value="" label="Insert your epitope/peptide:" help="e.g. KLLTQHFVQENY"/>
+	
+
+	<conditional name="OptionIdenSim">
+		<param type="select" name="option" display="radio" label="Do you want to use % identity or % similarity for the homology measurement?" >
+			<option value="Identity"> Identity</option>
+			<option value="Similarity"> Similarity</option>
+		</param>
+		<when value="Identity">
+			<param name="identity" type="text" value="80" label="% identity cut-off for homology" />
+			<param name="num_overlap" type="text" value="1" label="Set the minimum number of overlap AAs for the alignment:"/>
+		</when>
+		<when value="Similarity">
+			<param name="similarity" type="text" value="80" label="% similarity cut-off for homology" />
+			<param name="num_overlap" type="text" value="1" label="Set the minimum number of overlap AAs for the alignment:"/>
+		</when>
+	</conditional>
+
+
+</inputs>    
+
+<outputs>
+
+	<data name="output" format="txt" from_work_dir="myHomoPeps.txt"  label="HomoPeptides"/>	
+</outputs>
+
+    <help><![CDATA[
+        TODO: Fill in help.
+    ]]></help>
+</tool>

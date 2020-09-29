@@ -1,0 +1,103 @@
+<tool id="filter_seqs_nextera" name="Extract peptides from fastq" version="1.1.0" python_template_version="3">
+	<description>Import fastq file and extract peptides between flanking regions</description>	
+<requirements>
+        <requirement type="package" version="3">python</requirement>
+    </requirements>
+    <command detect_errors="exit_code"><![CDATA[
+	    python3 '$__tool_directory__/data_cleaning.py' 
+		-s $input1 
+		-n ${input1.name} 
+		#if $experiment_name.expname == "other"
+		-r $experiment_name.expname_other
+		#else
+		-r $experiment_name.expname
+		#end if
+		#if $regex.regex_list =="other"
+		-d $regex.regex_other
+		#else
+		-d $regex.regex_list
+		#end if
+		-c $codons 
+		-g $mismatches 
+		-f $flanking 
+		-o $output2 > $output1
+	   ]]></command>
+   <inputs>
+	    <param type="data" name="input1" format="fastq" />
+	    <conditional name="regex">
+	    <param name="regex_list"  label="Library Regex"  type="select"  help="Regex for finding theb combinatorial peptide" >
+		<option value="NNK_NNK_NNK_NNK_NNK_NNK_NNK_NNK_NNK_NNK_NNK">NNK11</option> 
+		<option value="NNK_NNK_NNK_NNK_NNK_NNK_NNK_NNK_NNK_NNK_NNK_NNK">NNK12</option>
+		<option value="NNK_TKG_NNK_NNK_CAG_NNK_TTT_NNK_NNK_GWG_NNK_NNK">NNK8_Anchor</option>
+		<option value="AAA_CTG_NNK_NNK_NNK_NNK_NNK_GTG_CAG_GAA_AAC_TAT">NNK5_MAGE</option>
+		<option value="AAA_CTG_NNK_ACC_CAG_NNK_TTC_GTG_NNK_GAA_AAC_TAT">NNK3_MAGE</option>	
+		<option value="NNK_NNK_NNK_NNK_RVK_NTT_CCG_TAT_CCG_NNK_NNK">NNK6ProSite</option>
+	        <option value="other">Other</option>
+	    </param>
+		<when value="other">
+			<param name="regex_other" type="text" label="Other non listed Regex (Letter case is important)"/>
+		</when>
+	</conditional>
+	<conditional name="experiment_name">
+            <param name="expname" type="select" label="Experiment name">
+                <option value="NNK11" selected="true">NNK11</option>
+                <option value="NNK6ProSite">NNK6ProSite</option>
+                <option value="NNK8_Anchor">NN8_Anchor</option>
+		<option value="NNK12">NNK12</option>
+		<option value="NNK5_MAGE">NNK5_MAGE</option>
+		<option value="NNK3_MAGE">NNK3_MAGE</option>
+		<option value="other">Other</option>
+
+       	</param>
+            <when value="other">
+                 <param name="expname_other" type="text" label="Other arbirtary name"/>
+            </when>
+        </conditional>
+
+	 <param name="codons" type="select" display="check" help="Select the codon usage table for this experiment">
+		<option value="Universal">Universal</option>
+		<option value="SupC_Ochre">SupC_Ochre</option>
+		<option value="SupE_Amber">SupE_Amber</option>
+		<option value="SupF_Amber">SupF_Amber</option>
+		<option value="SupU_Opal">SupU_Opal</option>
+          </param>
+	    <param name="mismatches" type="select" display="check" label="Number of allowed mismatches in flanking sequences" help="How many mismatches can we allow in flanking regions?">
+		    <option value="0">0</option>
+		    <option value="1">1</option>
+		    <option value="2">2</option>
+		    <option value="3">3</option>
+
+		</param>
+	 
+	    <param name="flanking" type="select" display="check" label="Flanking sequence pair">
+	            <option  value="TCCGGA GGCGGTGGTGG"> TCCGGA::GGCGGTGGTGG
+		    </option>
+	      </param>
+    </inputs>
+    <outputs>
+	    <data name="output1" format="txt" />
+	    <data name="output2" format="txt" from_work_dir="data_cleaning_peptide_output.txt" label="extracted sequences from ${tool.name} on ${on_string}"/>
+    	    <data name="output3" format="png" from_work_dir="graph_out.sum_stats.png" label="Graphical overview of run statistics from ${tool.name} on ${on_string}" />
+	    <data name="output5" format="json" from_work_dir="data_cleaning_peptide_output.json" label="JSON output from ${tool.name} on ${on_string}" />
+	    <data name="output4" format="txt" from_work_dir="data_cleaning_peptide_xli.txt" label="Sequences for further processing from ${tool.name} on ${on_string}"/>
+     </outputs>
+    <tests>
+        <test>
+            <param name="input1" value="Pool_1_index_1_ATCACG_NNK11_R0.fastq"/>
+            <output name="output1" file="Pool_1_index_1_ATCACG_NNK11_R0.fastq.out_flanking_format.txt"/>
+        </test>
+    </tests>
+    <help><![CDATA[
+        TODO: Fill in help.
+    ]]></help>
+    <citations>
+        <citation type="bibtex">
+@misc{renameTODO,
+  author = {LastTODO, FirstTODO},
+  year = {TODO},
+  title = {TODO},
+  url = {Intomics A/S’ \
+                    --help_from_command ‘data_cleaning.py},
+}</citation>
+    </citations>
+</tool>
