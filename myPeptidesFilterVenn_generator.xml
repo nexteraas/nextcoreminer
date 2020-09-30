@@ -3,7 +3,7 @@
 	<requirement type="package" version="3">python</requirement>
     </requirements>
     <command detect_errors="exit_code"><![CDATA[
-	    python3 '$__tool_directory__/myPeptidesFilterVenn.py' -f ${" ".join(map(str,$PepList  ))} -g ${" ".join(map(str,$groups  ))} -filterFreq $filterFreq 
+	    python3 '$__tool_directory__/myPeptidesFilterVenn.py' -f ${" ".join(map(str,$PepList  ))} -g '$groups' -filterFreq $filterFreq 
 
 	    -filterCounts $Counts.filterCounts
 	    #if $Counts.filterCounts=="yes":
@@ -28,7 +28,7 @@
 	    -filterNegCells $NegCellsFilter.filterNegCells
 	    
 	    #if $NegCellsFilter.filterNegCells=="yes"
-	    	 -negCells ${" ".join(map(str,$NegCellsFilter.negCells  ))}
+	    	 -negCells '$NegCellsFilter.negCells'
 	    	-negCellsCounts $NegCellsFilter.negCellsCounts
 	    #end if
 	
@@ -39,7 +39,7 @@
 
     <inputs>
 	    <param type="data"   name="PepList" label="Please upload the whole NNK library with peptides from different rounds and cell types"  multiple="True"  />
-	<param name="groups" type="text" label="Groups for venn diagram"  multiple="true" help="e.g. R2_R12C9 R2_R12C9mut4 R2_6F9 R2_380 R1_R12C9 R1_R12C9mut4 R1_6F9 R1_380"  />
+	<param name="groups" type="text" label="Groups for venn diagram"  help="e.g. R2_R12C9 R2_R12C9mut4 R2_6F9 R2_380 R1_R12C9 R1_R12C9mut4 R1_6F9 R1_380"  />
 	<param type="select" name="filterFreq" display="radio" label="Do you want to keep only the peptides with frequency increasing with the selection rounds (i.e. R2_freq >= R1_freq)?">
 		<option value="no" > No</option>
 		<option value="yes" > Yes</option>
@@ -51,7 +51,7 @@
 		 	 <option value="yes" > Yes</option>
 		</param>
        		<when value="yes">
-			<param name="counts" type="text" value="1" label="Insert your number:"/>
+			<param name="counts" type="text" value="0" label="Insert your number:" help="Note: 0 indicates all the peptides will be included."/>
 		</when>		
 	
 	</conditional>
@@ -62,9 +62,9 @@
 			<option value="yes" > Yes</option>
 		</param>
        		<when value="yes">
-			<param name="epi" type="text" value="KLLTQHFVQENY" label="Insert your epitope:" help="e.g. KLLTQHFVQENY. Scoring matrix of fasta36 is BLOSUM62"/>
-			<param name="op" type="text" value="100" label="Insert your gap opening penalty"/>
-			<param name="ep" type="text" value="0.5" label="Insert your gap extension penalty"/>
+			<param name="epi" type="text" value="KLLTQHFVQENY" label="Insert your epitope:" help="e.g. KLLTQHFVQENY. Homology is calculated by fasta36 with BL62 as scoring matrix. Homology to the epitope can be calculated in 'Homology Calculator'."/>
+			<param name="op" type="text" value="100" label="Insert your gap opening penalty:"/>
+			<param name="ep" type="text" value="0.5" label="Insert your gap extension penalty:"/>
 			<conditional name="OptionIdenSim">
 				<param type="select" name="option" display="radio" label="Do you want to use % identity or % similarity for the homology measurement?" >
 					<option value="Identity"> Identity</option>
@@ -93,7 +93,7 @@
 		</param>
 
 		<when value="yes">
-			<param name="negCells" type="text" multiple="True" label="Insert your negative cell types:" help="e.g. R1_380 R2_380"/>
+			<param name="negCells" type="text" label="Insert your negative cell types:" help="e.g. R1_380 R2_380. Note: cell type is written with whitespace, comma or semicolon as delimiters (all 3 or a mix of them work)." />
 			<param name="negCellsCounts" type="text" value="0" label="Insert the counts threshold in negative cell types:" help="Note: peptides with counts higher than a certain number in the negative cells will be removed. i.e. 0 indicates all the peptides that appear in the negative cells will be removed. 1 indicates peptides that appear in the negative cells, and counts are higher than 1 wil be removed." />
 		</when>
 

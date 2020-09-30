@@ -8,26 +8,28 @@ import sys
 import os
 from math import ceil
 import numpy as np
+import re
+from myHomoPeps import getHomoPeptides
+
 
 def parse_arguments():
     my_parser = argparse.ArgumentParser(allow_abbrev=False)
 
     my_parser.add_argument('-f',  nargs='*', 
-                                    help='The input should be lists of peptides with '
-                                    'specificity and frequency ')
+                                    help='The input should be lists of peptides with counts and frequency ')
    
-    my_parser.add_argument('-g', nargs='*',help='round_exp groups for venn')
+    my_parser.add_argument('-g', nargs='?',help='round_exp groups for venn')
     my_parser.add_argument('-filterFreq', nargs='?',default="no", help='remove peptides if R1_freq < R2_freq')
     my_parser.add_argument('-filterHomo', nargs='?',default="no", help='remove peptides if they do not share homology with epitope')
     my_parser.add_argument('-filterNegCells', nargs='?',default="no", help='remove peptides if they appear in the negative panning cells')
-    my_parser.add_argument('-negCells', nargs='*',help='negative cells, e.g. R1_380 R2_380')
+    my_parser.add_argument('-negCells', nargs='?',help='negative cells, e.g. R1_380 R2_380')
     my_parser.add_argument('-negCellsCounts', nargs='?',default="0", help='remove peptides if they appear in the negative panning cells with counts higher than * number')
     my_parser.add_argument('-epi',  nargs='?', default="KLLTQHFVQENY",
                                     help='The input should be the epitope of interest.')
-    my_parser.add_argument('-o', nargs='?', default="Identity",help='Please select Identity or Similarity  ')
+    my_parser.add_argument('-o', nargs='?', default="Identity",help='Identity or Similarity to measure homology  ')
 
     my_parser.add_argument('-threshold', nargs='?',  default="80",
-                                    help='The cutoff of identity/similarity for fasta. By default it is 80.')
+                                    help='The cutoff of identity/similarity for fasta.')
     my_parser.add_argument('-n', nargs='?',  default="1",
                                     help='The cutoff of number of overlap AA')
     my_parser.add_argument('-op', nargs='?',  default="100", help='Gap opening penalty')
@@ -35,7 +37,7 @@ def parse_arguments():
     my_parser.add_argument('-c', nargs='?',  default="0",
                                     help='Only include the peptides with counts higher than a number. '
                                     'By default it is 0, meaning all peptides will be included')
-    my_parser.add_argument('-filterCounts', nargs='?',default="no", help='remove peptides if the counts is lower than XX')
+    my_parser.add_argument('-filterCounts', nargs='?',default="no", help='remove peptides from neg cells with counts higher than XX')
     
     return my_parser.parse_args()
 
@@ -77,76 +79,6 @@ def get_logics(n_sets):
     for i in range(1, 2**n_sets):
         yield bin(i)[2:].zfill(n_sets)
 
-        
-        
-def getHomoPeptides (dfTmp, myEpi, option, threshold, num_overlap, op, ep):
-    df_homo =  pd.DataFrame()
-    myCmd1 = '''echo ">" '''+ myEpi + '''"\n"''' + myEpi + "> myDatabaseEpi.fa"
-    os.system(myCmd1)
-
-    fasta36 = "/usr/bin/fasta-36.3.8h/bin/fasta36"
-
-    maxi = 60000
-    num_files = ceil(len(list(dfTmp.index))/maxi)
-
-    arrTmps = np.array_split(list(dfTmp.index), num_files)   
-    for i in range(0,len(arrTmps)):
-        tmps = arrTmps[i]
-        outTmp = open("myDatabase" + str(i) + ".fa", "w")
-        for tmp in tmps:
-            outTmp.write(">" + tmp + "\n")
-            outTmp.write(tmp + "\n")
-        outTmp.close()
-
-        myCmd2 = fasta36 + " -s BP62 myDatabaseEpi.fa myDatabase"  + str(i) + ".fa -f " + op + " -g " + ep + "  -b=" + str(maxi) + " > myDatabase" + str(i) + ".out"
-        os.system(myCmd2)
-
-        myCmd3 = '''gawk 'length($0)>0' myDatabase''' + str(i) + ".out > myDatabase.tmp"
-        os.system(myCmd3)
-        
-        file0 = open("myDatabase.tmp" )
-        arrLine = []
-        while True:
-            line = file0.readline().rstrip()
-            if (len(line) == 0):
-                break
-            arrLine.append(line)
-        file0.close()
-
-        out = open("myDatabase" + str(i) + ".final","w")
-        for index in range(0,len(arrLine)):
-            if(arrLine[index].startswith(">>")):
-                pep = arrLine[index].replace(">>","").split()[0]
-                identity = ""
-                similarity = ""
-                num = 0
-                num_db = 0
-                num_sd = 0
-                identity = arrLine[index + 2].split("; ")[1].split(" identity (")[0].lstrip().replace("%","") 
-                similarity = arrLine[index + 2].split("; ")[1].split(" identity (")[1].split(" similar")[0].lstrip().replace("%","")
-                dotsLine = arrLine[index + 5].lstrip()
-                num = len(dotsLine)
-                num_db = dotsLine.count(":")
-                num_sd = dotsLine.count(".") + num_db
-
-                out.write(pep + "\t" + identity + "\t" + similarity + "\t" + str(num) + "\t" + str(num_db) + "\t" + str(num_sd) + "\n")
-
-        out.close()      
-
-        df_tmp = pd.read_csv("myDatabase" + str(i) + ".final", index_col=0, header=None,sep="\t")
-        df_homo = pd.concat([df_homo, df_tmp],axis=0,sort=True)
-        
-    myCmd6 = "rm myDatabase*" 
-    os.system(myCmd6)
-    columnNames = [ "Identity(%)" , "Similarity(%)" , "#OverlapAA" ,"#IdentityAA" , "#SimilarityAA" ]
-    df_homo.columns = columnNames
-    
-    cond1 = df_homo[option + "(%)"] >= threshold
-    cond2 = df_homo["#OverlapAA"] >= num_overlap
-
-    df_homo = df_homo[cond1 & cond2 ]
-    return (df_homo)
-       
 
 def checkValueIncrease(arr_tmp): 
     
@@ -187,6 +119,9 @@ def filtering_Epi(files,filterCounts, counts, myGroups, filterHomo, myEpi, optio
             my_df_homo = getHomoPeptides(d[name2], myEpi,option, threshold, num_overlap, op, ep)
             d[name2] = d[name2][d[name2].index.isin(my_df_homo.index)]
             
+            cmd_remove = "rm myFasta_out.txt" 
+            os.system(cmd_remove)
+            
             if (name2 in myGroups):
                 refLog["filterHomo" + "AND" + name2] = d[name2].shape[0]
             
@@ -196,11 +131,10 @@ def filtering_Epi(files,filterCounts, counts, myGroups, filterHomo, myEpi, optio
     ######### START of Filtering3 - Negative cells   #######
     if (filterNegCells == "yes"):
         
-        negCells_new = ['%s_Frequency' % (x) for x in negCells]
         negCellsCounts_new = ['%s_TotalCount' % (x) for x in negCells]
         
-        condition1 = ~ (my_df[negCells_new].isna().all(axis = 1))  ## if in negative cells, then remove
-        condition2 = (my_df[negCellsCounts_new].astype(float) > negCellsCounts).any(axis = 1)  ## if in negative cells, then remove thouse with counts higher than *number
+        condition1 = ~ (my_df[negCellsCounts_new].isna().all(axis = 1))  ## should not be NA in ALL the neg cells
+        condition2 = (my_df[negCellsCounts_new].astype(float) > negCellsCounts).any(axis = 1)  ## if in negative cells, then remove those with counts higher than a number
 
         dfTmp = my_df[condition1 & condition2]
         
@@ -291,7 +225,8 @@ def merge_df(refExps, rounds, my_df,filterFreq, refD, myGroups):
             refD[rou + "_" + exp] = myPeps
     
     refLog = {}  
-    for myGroup in myGroups:
+    if (filterFreq == "yes"):
+        for myGroup in myGroups:
             refLog["filterFreq" + "AND" + myGroup] = df_merged[df_merged[myGroup + "_Frequency"].notnull()].shape[0]
             
     return df_merged, refD, refLog
@@ -346,8 +281,6 @@ def save_vennPDF(myGroups, refD):
     out.close()
        
 
-
-
 def main():  
     args = parse_arguments()
     refArgs = vars(args)
@@ -355,12 +288,21 @@ def main():
         sys.exit("Please provide a valid file.")
 
     files=refArgs.get("f") 
-    myGroups = refArgs.get("g") 
+    myGroup = refArgs.get("g") 
     filterFreq = refArgs.get("filterFreq") 
     filterHomo = refArgs.get("filterHomo") 
     filterNegCells = refArgs.get("filterNegCells") 
     filterCounts = refArgs.get("filterCounts") 
-    negCells = refArgs.get("negCells") 
+    negCell = refArgs.get("negCells") 
+    
+    delimiters = ["X",",", ";", " "]
+    regexPattern = '|'.join(map(re.escape, delimiters))
+    negCellTmp= re.split(regexPattern, negCell)
+    negCells = [x for x in negCellTmp if x] 
+    
+    myGroupTmp= re.split(regexPattern, myGroup)
+    myGroups = [x for x in myGroupTmp if x] 
+    
     negCellsCounts = int(refArgs.get("negCellsCounts"))
     
     myEpi = refArgs.get("epi") 
@@ -382,7 +324,7 @@ def main():
 
     ## output log
     outLog = open("FilterLog.txt","w")
-    outLog.write("python3 myVenn.py ")
+    outLog.write("python3 myPeptidesFilterVenn.py ")
     n = len(sys.argv) 
     
     for i in range(1, n): 
@@ -439,6 +381,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
 
 
 
