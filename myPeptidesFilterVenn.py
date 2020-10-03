@@ -22,7 +22,7 @@ def parse_arguments():
     my_parser.add_argument('-filterFreq', nargs='?',default="no", help='remove peptides if R1_freq < R2_freq')
     my_parser.add_argument('-filterHomo', nargs='?',default="no", help='remove peptides if they do not share homology with epitope')
     my_parser.add_argument('-filterNegCells', nargs='?',default="no", help='remove peptides if they appear in the negative panning cells')
-    my_parser.add_argument('-negCells', nargs='?',help='negative cells, e.g. R1_380 R2_380')
+    my_parser.add_argument('-negCells', nargs='?',default="",help='negative cells, e.g. R1_380 R2_380')
     my_parser.add_argument('-negCellsCounts', nargs='?',default="0", help='remove peptides if they appear in the negative panning cells with counts higher than * number')
     my_parser.add_argument('-epi',  nargs='?', default="KLLTQHFVQENY",
                                     help='The input should be the epitope of interest.')
@@ -241,8 +241,10 @@ def save_vennPDF(myGroups, refD):
             mySize = myLen
     if (mySize ==0):
         sys.exit("There are no peptides after filterings")
-    if (len(myGroups)<2):
+    if (len(myGroups)<2 ):
         print("Venn diagram needs at least 2 datasets.")
+    elif(len(myGroups)>6):
+        print("Venn diagram cannot be shown for more than 6 datasets.")
     else:
         _, top_axs = plt.subplots(ncols=1, nrows=2, figsize=(7, 14))
         venn(refMyVenn,  ax =top_axs[0])
@@ -294,11 +296,13 @@ def main():
     filterNegCells = refArgs.get("filterNegCells") 
     filterCounts = refArgs.get("filterCounts") 
     negCell = refArgs.get("negCells") 
-    
+   
+    negCells = []
     delimiters = ["X",",", ";", " "]
     regexPattern = '|'.join(map(re.escape, delimiters))
-    negCellTmp= re.split(regexPattern, negCell)
-    negCells = [x for x in negCellTmp if x] 
+    if (len(negCell) != 0):
+        negCellTmp= re.split(regexPattern, negCell)
+        negCells = [x for x in negCellTmp if x] 
     
     myGroupTmp= re.split(regexPattern, myGroup)
     myGroups = [x for x in myGroupTmp if x] 
@@ -343,10 +347,7 @@ def main():
     outLog.close()
 
 
-    if ( len(myGroups)>6):
-        print ("Venn diagram cannot be shown.")
-    else:
-        save_vennPDF(myGroups, refD)
+    save_vennPDF(myGroups, refD)
 
 
     arr_Groups = []

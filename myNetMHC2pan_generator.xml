@@ -9,15 +9,16 @@
 	]]></command> 
     
 <inputs>
-	<param type="data" format = "txt" name="input" label="Peptide" multiple="True" help="The input can be a matrix file, but the 1st column should be peptides"/>
+	<param type="data" format = "txt" name="input" label="Peptide"  help="The input can be a matrix file, but the 1st column should be peptides"/>
 	<param name="allele" type="text" value="" label="Insert your allele:"  help="e.g. HLA-DPA10103-DPB10401 for DP4, HLA-DQA10501-DQB10201 for DQ2.5"  />
 </inputs>    
 
 <outputs>
 
 	<data name="output1" format="txt" from_work_dir="myNetMHC2pan.txt"  label="NetMHC2pan Output"/>	
-	<data name="output2" format="txt" from_work_dir="myNetMHC2pan.BinderCount.txt" label="NetMHC2pan Binder Count"/>    
+	<data name="output2" format="txt" from_work_dir="myNetMHC2pan.binder.txt" label="NetMHC2pan Binder"/>    
 	<data name="output3" format="txt" from_work_dir="myNetMHC2pan.9mer.txt" label="NetMHC2pan 9mer"/>
+
 </outputs>
 
     <help><![CDATA[

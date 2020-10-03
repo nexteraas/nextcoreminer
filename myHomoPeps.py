@@ -14,16 +14,20 @@ def parse_arguments():
 
     my_parser.add_argument('-epi',  nargs='?', default="",
                                     help='The input should be the epitope of interest.')
+
     my_parser.add_argument('-o', nargs='?', default="Identity",help='Please select Identity or Similarity  ')
     my_parser.add_argument('-threshold', nargs='?',  default="80",
                                     help='The cutoff of identity/similarity for fasta. By default it is 80.')
+    my_parser.add_argument('-op', nargs='?',  default="100", help='Gap opening penalty')
+    my_parser.add_argument('-ep', nargs='?',  default="0.5", help='Gap extension penalty')
+
     my_parser.add_argument('-n', nargs='?',  default="1",
                                     help='The cutoff of number of overlap AA')
 
     return my_parser.parse_args()
 
 
-def getHomoPeptides (dfTmp, myEpi, option, threshold, num_overlap):
+def getHomoPeptides (dfTmp, myEpi, option, threshold, num_overlap, op, ep):
     df_homo =  pd.DataFrame()
     myCmd1 = '''echo ">" '''+ myEpi + '''"\n"''' + myEpi + "> myDatabaseEpi.fa"
     os.system(myCmd1)
@@ -42,7 +46,7 @@ def getHomoPeptides (dfTmp, myEpi, option, threshold, num_overlap):
             outTmp.write(tmp + "\n")
         outTmp.close()
 
-        myCmd2 = fasta36 + " -s BP62 myDatabaseEpi.fa myDatabase"  + str(i) + ".fa -f 100 -g 0.5  -b=" + str(maxi) + " > myDatabase" + str(i) + ".out"
+        myCmd2 = fasta36 + " -s BP62 myDatabaseEpi.fa myDatabase"  + str(i) + ".fa -f " + op + " -g " + ep  + " -b=" + str(maxi) + " > myDatabase" + str(i) + ".out"
         os.system(myCmd2)
         
         myCmd3 = '''gawk 'length($0)>0' myDatabase''' + str(i) + ".out > myDatabase.tmp"
@@ -79,7 +83,9 @@ def getHomoPeptides (dfTmp, myEpi, option, threshold, num_overlap):
 
         df_tmp = pd.read_csv("myDatabase" + str(i) + ".final", index_col=0, header=None,sep="\t")
         df_homo = pd.concat([df_homo, df_tmp],axis=0,sort=True)
-        
+    
+    myCmd_cat = "cat myDatabase*.out > myFasta_out.txt"
+    os.system(myCmd_cat)
     myCmd6 = "rm myDatabase*" 
     os.system(myCmd6)
     columnNames = [ "Identity(%)" , "Similarity(%)" , "#OverlapAA" ,"#IdentityAA" , "#SimilarityAA" ]
@@ -98,17 +104,19 @@ def main():
     if ("f" not in refArgs):
         sys.exit("Please provide a valid file.")
 
-    myFile=refArgs.get("f") ##clusters of peptides
+    myFile=refArgs.get("f") 
     myEpi = refArgs.get("epi") ##epitope of interest
     option = refArgs.get("o") ##option of identity or threshold
     threshold = float(refArgs.get("threshold")) ## threshold cutoff
     num_overlap = float(refArgs.get("n")) ## number of overlap AA
+    op = refArgs.get("op") ##Gap opening penalty
+    ep = refArgs.get("ep") ##gap extension penalty
 
     cmd0 = "cut -f 1 " + myFile + " |awk '$0 ~ /^[A-Z]+$/' > myTmp0"
     os.system(cmd0)
 
     dfTmp = pd.read_csv("myTmp0",header=None,index_col=0,sep="\t",dtype=str)
-    df_homo = getHomoPeptides(dfTmp, myEpi, option, threshold, num_overlap)
+    df_homo = getHomoPeptides(dfTmp, myEpi, option, threshold, num_overlap,op,ep)
     df_homo = df_homo.rename_axis('Peptides')
 
     df_homo.to_csv("myHomoPeps.txt", sep="\t", index = True, header=True)

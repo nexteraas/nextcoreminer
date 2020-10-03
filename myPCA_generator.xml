@@ -1,26 +1,26 @@
 
-<tool id="myPCA_generator" name="PCA Generator" version="0.1.0" python_template_version="3.5">
+<tool id="myPCA_generator" name="PCA UMap Louvain Generator" version="0.1.0" python_template_version="3.5">
     <requirements>
 	<requirement type="package" version="3">python</requirement>
     </requirements>
    
     <command detect_errors="exit_code"><![CDATA[
-	    python3 '$__tool_directory__/myPCA_UMap_Louvain.py' -f '$input'  -b $blosum  -o $option -tsne $tsne  -colorClass $colorClass
+	    python3 '$__tool_directory__/myPCA_UMap_Louvain.py' -f '$input'  -b $blosum  -o $option -tsne $tsne  -colorClass ${" ".join(map(str,$colorClass  ))} 
 	    
 	    -wOption $WeightOption.wOption
 	    #if $WeightOption.wOption=="yes":
 	    	-w '$WeightOption.weight' 
 	    #end if
     ]]></command> 
-<!--	<code file="dynamic_options.py" />  -->
+
     
 <inputs>
-	<param type="data" format = "txt" name="input" label="Matrix file from Venn:"/>
+	<param type="data" format = "txt" name="input" label="Matrix file from 'Peptides Filter and Venn Generator':"/>
 
-	<param name="colorClass" type="select" display="radio" label="PCA UMAP (tSNE) should be colored by:" > 
+	<param name="colorClass" type="select" display="checkboxes" multiple="True" label="PCA UMAP (tSNE) should be colored by:" > 
 		<option value="groups"> Groups </option>
 		<option value="rounds"> Rounds </option>
-		<option value="cellTypes"> Cell Types </option>
+		<option value="cells"> Cells </option>
 	</param>
 
 
@@ -65,8 +65,11 @@
 		<discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt" ext="txt" directory="Louvain_Clusters"  visible="false"  />
 	</collection>
 
-	<data name="output4" format="txt" from_work_dir="sum.txt"  label="Cluster stats TXT"/>	
-	<data name="output5" format="json" from_work_dir="sum.json" label="Cluster stats JSON"/>
+
+	<collection name="output4" type="list" label="Cluster stats TXT">	
+		<discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt" ext="txt" directory="sum_stats" visible="false"  />
+	</collection>
+
 </outputs>
 
     <help><![CDATA[

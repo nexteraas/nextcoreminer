@@ -21,7 +21,7 @@
 		<param name="rounds" type="text" data_ref="input" label="Rounds of the dataset:" help="e.g. R0, R1 or R2; Round 0, Round 1 or Round 2"/>
 	</repeat>
 
-	<param name="title" type="text" value="" label="Insert title of the plot"/>
+	<param name="title" type="text" value="" label="Insert title of the plot if it is needed:"/>
 
 	<conditional name="InputType">
 		<param name="option" type="select" display="radio"  label="Do you want to select top XX peptides or top XX% of the peptides?" >

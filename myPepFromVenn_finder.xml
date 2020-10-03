@@ -5,12 +5,12 @@
     </requirements>
    
     <command detect_errors="exit_code"><![CDATA[
-    	python3 '$__tool_directory__/myPepFromVenn.py' -f '$input'    -g ${" ".join(map(str,$groups  ))}  
+    	python3 '$__tool_directory__/myPepFromVenn.py' -f '$input'    -g '$groups' 
     ]]></command> 
     
 <inputs>
-	<param type="data" format = "txt" name="input" label="Matrix file from Venn:" />
-	<param name="groups" type="text" value="" label="Insert your groups:"  multiple="true" help="e.g. R2_R12C9+R2_6F9 R2_R12C9mut4+R2_6F9"  />
+	<param type="data" format = "txt" name="input" label="Matrix file from 'Peptides Filter and Venn Generator':" />
+	<param name="groups" type="text" value="" label="Insert your intersection groups:"  help="e.g. R2_R12C9+R2_6F9 R2_R12C9mut4+R2_6F9. Note: group is written with whitespace, comma or semicolon as delimiters (all 3 or a mix of them work)."  />
 </inputs>    
 
 <outputs>

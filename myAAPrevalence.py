@@ -174,7 +174,7 @@ def main():
     if (len(myColors) != len(myFiles)):
         for i in range(0, len(myFiles)):
             myColors.append("Reds")
-    #myColors = ['Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds', 'PuBu', 'BuGn', "RdPu"]
+    
     
     optionScale = refArgs.get("optionScale") ## scale AA prevalence with counts
     optionOut = refArgs.get("optionOut") ## Do you want to ignore some positions

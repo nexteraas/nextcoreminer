@@ -8,18 +8,15 @@ import seaborn as sns
 import scipy.cluster.hierarchy as hc
 import numpy as np
 import warnings
+import os
 warnings.filterwarnings('ignore')
 
 
 def parse_arguments():
     my_parser = argparse.ArgumentParser(allow_abbrev=False)
 
-    my_parser.add_argument('-f', nargs='?',  default="test.txt",
-                                    help='The input should be a list of peptides with counts, '
-                                    'specificity and frequency, by default test.txt is read. ')
-    my_parser.add_argument('-l', nargs='?',  default="11",
-                                    help='The number of AAs for the peptides, '
-                                    'it should be an integer. By default it is 11.')   
+    my_parser.add_argument('-f', nargs='?',  help='The input should be a list of peptides with groups, cells and rounds ')
+    
     my_parser.add_argument('-o', nargs='?', default="1",
                                     help='Please type an integer if you want to add weight the Bolsum matrix. '
                                     '1: euclidean 2: kullback leibler divergence - relative entropy. '
@@ -39,22 +36,24 @@ def kl_divergence(p, q):
     return (sum)
 
 
-def calcEUDistance (fileTmp, length, blosum_option, AAs, refBlo, colorClass):    
-    arrTitle = []    
-    for tmp in AAs:
-        for leng in range(1,length + 1):
-            arrTitle.append("P" + tmp + str(leng))
+def calcEUDistance (fileTmp, blosum_option, AAs, refBlo, colorClass):    
+    
     refScore = {}   
     myPeps = []
-    refScore["Peps"] = ["Classes"] + arrTitle
+    refScore["Peps"] = ["Classes"] 
+    myLength = 0
 
-    file0 = open( fileTmp)  
+    cmd0 =  ''' gawk -F "\t" ' $1 ~ /^[A-Z]+$/' ''' + fileTmp  + "> myFileTmp"
+    os.system(cmd0)
+    
+    file0 = open( "myFileTmp")  
     while True:
         line0=file0.readline().rstrip()
         if (len(line0) == 0):
             break
         arr = line0.split("\t")
-        pep=arr[0]
+         
+        classes = ""
         if (colorClass == "groups"):
             classes = arr[1]
         elif (colorClass == "rounds"):
@@ -62,24 +61,34 @@ def calcEUDistance (fileTmp, length, blosum_option, AAs, refBlo, colorClass):
         else:
             classes = arr[3]
 
+        pep = arr[0]
         peps = list(pep)
-        pep = classes + "_MY_" + pep
-        
-        if (len(peps) == length):
-            score=[]
-            for i in range(0,len(peps)):
-                aa = peps[i]
-                score1 = refBlo.get(aa).split(" ")
-                for tmp in score1:
-                    tmp2 = ""
-                    if (blosum_option == "blosum" ):
-                        tmp2 = float(tmp)            ##option1: no frequency ##option3: add freq as a feature ##add weight to each position
+        pep = classes + "&" + pep
 
-                    score.append(str(tmp2)) # ##using the df to calculate EU: 
-            refScore[pep] = score 
-            myPeps.append(classes + "_MY_" + arr[0] )
+        myLength = len(peps)
+
+        score=[]
+        for i in range(0,len(peps)):
+            aa = peps[i]
+            score1 = refBlo.get(aa).split(" ")
+            for tmp in score1:
+                tmp2 = ""
+                if (blosum_option == "blosum" ):
+                    tmp2 = float(tmp)            ##option1: no frequency ##option3: add freq as a feature ##add weight to each position
+
+                score.append(str(tmp2)) # ##using the df to calculate EU: 
+        refScore[pep] = score 
+        myPeps.append(pep)
+        
     file0.close()
 
+    arrTitle = []        
+    for tmp in AAs:
+        for leng in range(1,myLength + 1):
+            arrTitle.append("P" + tmp + str(leng))
+    refScore["Peps"] = ["Classes"] + arrTitle
+        
+    
     data={}
     for i in range(0,len(myPeps)):
         for j in range(i,len(myPeps)):
@@ -99,19 +108,30 @@ def calcEUDistance (fileTmp, length, blosum_option, AAs, refBlo, colorClass):
     first_elements = [a_tuple[1] for a_tuple in tuple_list]
     dist_matrix.columns = first_elements
     dist_matrix =  dist_matrix/max(dist_matrix.max())
-    #dist_matrix.to_csv(fileTmp + ".Eudist.txt.my", sep="\t", index = True, header=True)
+    
+    dist_matrix = dist_matrix.rename_axis('EuclideanDist')
+    dist_matrix.to_csv("Distance_matrix.txt", sep="\t", index = True, header=True)
+    
+    cmd3 = "rm myFileTmp"
+    os.system(cmd3)
+
     return (dist_matrix)
     
     
+def calcShannonDistance (fileTmp, AAs, colorClass):
+    cmd2 =  ''' gawk -F "\t" ' $1 ~ /^[A-Z]+$/' ''' + fileTmp  + "> myFileTmp"
+    os.system(cmd2)
     
-def calcShannonDistance (fileTmp,length, AAs, colorClass):
-    file0 = open( fileTmp)  
+    file0 = open( "myFileTmp")  
     myPeps = []
+    myLength = 0
     while True:
         line0=file0.readline().rstrip()
         if (len(line0) == 0):
             break
         arr = line0.split("\t")
+        
+        classes = ""
         pep=arr[0]
         if (colorClass == "groups"):
             classes = arr[1]
@@ -119,20 +139,21 @@ def calcShannonDistance (fileTmp,length, AAs, colorClass):
             classes = arr[2]
         else:
             classes = arr[3]
-
+        
+        pep = arr[0]
         peps = list(pep)
-
-        if (len(peps) == length):
-            myPeps.append(classes + "_MY_" + arr[0] )
+        pep = classes + "&" + pep
+        myPeps.append(pep )
+        myLength = len(peps)
             
     file0.close()
 
     refBlo={}
     for AA in AAs:
-        refBlo[AA] = [0] * length
+        refBlo[AA] = [0] * myLength
 
     for myPep in myPeps:
-        peps=list(myPep.split("_MY_")[1])    
+        peps=list(myPep.split("&")[1])    
         for i in range(0,len(peps)):
             my_arr = refBlo.get(peps[i])
             my_arr[i] = my_arr[i] + 1
@@ -142,7 +163,7 @@ def calcShannonDistance (fileTmp,length, AAs, colorClass):
     refScore = {}
     for myPep in myPeps:
         freq = []
-        peps=list(myPep.split("_MY_")[1])    
+        peps=list(myPep.split("&")[1])    
         for i in range(0,len(peps)):
             value = df.at[peps[i],i]
             freq.append(value)
@@ -167,8 +188,14 @@ def calcShannonDistance (fileTmp,length, AAs, colorClass):
     tuple_list=dist_matrix.columns.tolist()
     first_elements = [a_tuple[1] for a_tuple in tuple_list]
     dist_matrix.columns = first_elements
+    
+    dist_matrix = dist_matrix.rename_axis('ShannonDist')
+    
+    dist_matrix.to_csv("Distance_matrix.txt", sep="\t", index = True, header=True)
+    
+    cmd3 = "rm myFileTmp"
+    os.system(cmd3)
 
-    #dist_matrix.to_csv(fileTmp + ".Shannondist.txt", sep="\t", index = True, header=True)
     return (dist_matrix)
 
 def heatmapCluster(df,outName, colorClass, option):
@@ -176,8 +203,8 @@ def heatmapCluster(df,outName, colorClass, option):
     myColors = ["#490092","#24FF24","#FF6DB6", "#009292", "#396AB1","#DA7C30", "#3E9651", "#CC2529", "#535154", "#6B4C9A", "#922428", "#948B3D", "#984ea3", "#ff7f00", "#ffff33", "#a65628","#e1f5fe","#1A4756","#33918D","#F6D82D","#E39517","#D4342D"]
     myColumns = df.columns
     myRows = df.index
-    myColumns = [i.split('_MY_')[0] for i in myColumns] 
-    myRows = [i.split('_MY_')[0] for i in myRows] 
+    myColumns = [i.split('&')[0] for i in myColumns] 
+    myRows = [i.split('&')[0] for i in myRows] 
     df.columns = myColumns
     df.index = myRows
     mycols = []
@@ -205,18 +232,16 @@ def heatmapCluster(df,outName, colorClass, option):
     
 
     g = sns.clustermap(df, row_linkage=linkage, col_linkage=linkage, xticklabels=False, yticklabels=False, linecolor='gray',col_colors=colors1,cmap="BuPu",figsize=(8,8))
-    g.fig.suptitle(myTitle)
+    g.fig.suptitle(myTitle, y=1.01)
 
     for (label, colour) in refCol.items():
         g.ax_row_dendrogram.bar(0.5, 0.0, color=colour, label="{}".format(label))
 
     nrows = 25
     ncols = int(np.ceil(len(refCol) / float(nrows)))
-    legend = g.ax_row_dendrogram.legend(ncol=ncols, title=colorClass,bbox_to_anchor=(5.3, 1), loc='upper left',fontsize='x-small')
+    legend = g.ax_row_dendrogram.legend(ncol=ncols, title=colorClass,bbox_to_anchor=(5.3, 1), borderaxespad=1., loc='upper left',fontsize='x-small')
     legend.get_frame().set_facecolor('none')
-    #legend.get_frame().set_linewidth(0.0)
     
-    #g.cax.set_position([0.92, .29, .03, .4])
     plt.savefig(outName + ".png",dpi=600,bbox_inches='tight')
     plt.close('all')
     
@@ -268,16 +293,19 @@ def main():
     if ("f" not in refArgs):
         sys.exit("Please provide a valid file.")
 
-    myFile = refArgs.get("f") ##peptide file with frequency
-    myLength = int(refArgs.get("l")) ##peptide sequence length
-    colorClass = refArgs.get("colorClass") ##Heatmap color by classes, rounds or cellTypes
+    myFile = refArgs.get("f") ##peptide file 
+        
+    colorClass = refArgs.get("colorClass") 
     option = refArgs.get("o") #option for euclidean distance or relative entropy
 
     if (option == "1"):
-        heatmapCluster(calcEUDistance(myFile, myLength, blosum_option, AAs, refBlo, colorClass),"HeatmapWithinCluster", colorClass, option)
+        heatmapCluster(calcEUDistance(myFile, blosum_option, AAs, refBlo, colorClass),"HeatmapWithinCluster", colorClass, option)
     else:
-        heatmapCluster(calcShannonDistance(myFile, myLength, AAs, colorClass),"HeatmapWithinCluster", colorClass, option)
-
+        heatmapCluster(calcShannonDistance(myFile, AAs, colorClass),"HeatmapWithinCluster", colorClass, option)
+    
+    
+    
 if __name__ == "__main__":
     main()
+
 

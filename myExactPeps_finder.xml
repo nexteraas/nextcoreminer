@@ -5,12 +5,12 @@
     </requirements>
    
     <command detect_errors="exit_code"><![CDATA[
-    	python3 '$__tool_directory__/myExactPeps.py' -f ${" ".join(map(str,'$input'  ))}   -peps ${" ".join(map(str,$peps  ))}  
+    	python3 '$__tool_directory__/myExactPeps.py' -f ${" ".join(map(str,$input  ))}   -peps '$peps'   
     ]]></command> 
     
 <inputs>
 	<param type="data" format = "txt" name="input" label="Cluster list:" multiple="True"/>
-	<param name="peps" type="text" value="" label="Insert your peptides:"  multiple="true" help="e.g. AWLTQFFVYEEW LLCRQRFAVESF YLCVQIFPGETY"  />
+	<param name="peps" type="text" value="" label="Plsease insert your peptides:"   help="e.g. AWLTQFFVYEEW LLCRQRFAVESF YLCVQIFPGETY. Note: peptide is written with whitespace, comma or semicolon as delimiters (all 3 or a mix of them work)."  />
 </inputs>    
 
 <outputs>

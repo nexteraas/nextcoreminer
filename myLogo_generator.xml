@@ -31,7 +31,7 @@
 
 			<repeat name="series" title="Peptides files">
                 		<param name="input" type="data" format="txt" label="Dataset" help="The input can be a matrix file, but the 1st column should be peptides"/>
-                		<param name="titles" type="text" data_ref="input" label="Name of the dataset"/>
+                		<param name="titles" type="text" data_ref="input" label="Insert title of the plot if it is needed:"/>
         		</repeat>
 		</when>
 

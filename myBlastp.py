@@ -92,10 +92,7 @@ def runBlastp (dfTmp, db, evalue, op, ep):
     
     df_homo = pd.read_csv("myTmpPeps.out.txt",header=0,index_col=0,sep="\t")
     
-    #cond1 = df_homo[option + "(%)"] >= threshold
-    #cond2 = df_homo["#OverlapAA"] >= num_overlap
 
-    #df_homo = df_homo[cond1 & cond2 ]
     df_homo = df_homo.sort_values(by ='E-value' )
     
     myCmd_rm = "rm myTmpPeps*"
@@ -111,10 +108,10 @@ def main():
 
     myFile=refArgs.get("f") ##clusters of peptides
     mydb = refArgs.get("db") ##blast db
-    evalue = refArgs.get("evalue") ## evalue cutoff
+    evalue = refArgs.get("evalue").strip() ## evalue cutoff
     
-    op = refArgs.get("op") ##Gap opening penalty
-    ep = refArgs.get("ep") ##gap extension penalty
+    op = refArgs.get("op").strip() ##Gap opening penalty
+    ep = refArgs.get("ep").strip() ##gap extension penalty
 
     cmd0 = "cut -f 1 " + myFile + " |awk '$0 ~ /^[A-Z]+$/' > myTmp0"
     os.system(cmd0)
@@ -125,8 +122,6 @@ def main():
 
     df_homo.to_csv("myBlastp.out.txt", sep="\t", index = True, header=True)
     
-    
-    #logomatI.to_csv("pssm.txt",sep="\t", index = True, header=True)
     
     cmd1 = "rm myTmp0"
     os.system(cmd1)

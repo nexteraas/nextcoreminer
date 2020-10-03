@@ -3,14 +3,14 @@ import argparse
 import os
 import sys
 import pandas as pd
-
+import re
 
 def parse_arguments():
     my_parser = argparse.ArgumentParser(allow_abbrev=False)
 
     my_parser.add_argument('-f', nargs='*',  help='The clusters of peptides ')
 
-    my_parser.add_argument('-peps',  nargs='*',
+    my_parser.add_argument('-peps',  nargs='?',
                                     help='The input should be the peptides of interest.')
 
 
@@ -41,7 +41,11 @@ def main():
         sys.exit("Please provide a valid file.")
 
     myFiles= refArgs.get("f") ##clusters of peptides
-    myPeps = refArgs.get("peps") ##peptides of interest
+    myPep = refArgs.get("peps") ##peptides of interest
+    delimiters = ["X",",", ";", " "]
+    regexPattern = '|'.join(map(re.escape, delimiters))
+    myPepTmp= re.split(regexPattern, myPep)
+    myPeps = [x for x in myPepTmp if x]
 
 
     out = open("myExactPeps.txt","w")

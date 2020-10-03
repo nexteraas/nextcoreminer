@@ -172,8 +172,7 @@ def data_for_json(peptide_dict, rounds_list, desitnation_folder):
 
 	sorted_rounds_list = sort_on_source(rounds_list)
 	
-	write_folder= desitnation_folder
-
+	
 	## the informaiton used in the data tabel
 	print_list = ['rank', 'freq', 'count', 'meta']
 
@@ -231,8 +230,8 @@ def data_for_json(peptide_dict, rounds_list, desitnation_folder):
 
 	
 	## generate the file paths for the data output
-	data_output_destination = os.path.join(write_folder, "data_table.json")
-	R0_only_output_destination = os.path.join(write_folder, "R0_data_table.json")
+	data_output_destination = os.path.join(desitnation_folder, "data_table.json")
+	R0_only_output_destination = os.path.join(desitnation_folder, "R0_data_table.json")
 
 	## write the data output files to jsonp format
 	write_out_json(pre_pd_dict, max_value_dict, data_output_destination)
@@ -314,12 +313,19 @@ def data_structure(data_in, max_value_dict):
 				if re.search(r"_freq",attr):
 					data_dict[attr] = 0
 				elif re.search(r"_count",attr):
-					data_dict[attr] = int(max_value_dict[attr])*-1
+					if attr in max_value_dict:
+						data_dict[attr] = int(max_value_dict[attr])*-1
+					else:
+						data_dict[attr] = -1
+
 				elif re.search(r'_meta', attr):
 					data_dict[attr] = [['NA'],['NA']]
 				else:
-					fltAttr = int(max_value_dict[attr])
-					data_dict[attr] = fltAttr*100
+					if attr in max_value_dict:
+						fltAttr = int(max_value_dict[attr])
+						data_dict[attr] = fltAttr*100
+					else: 
+						data_dict[attr] = 100000
 
 			## else add the infromation to the data structure
 			else:
@@ -346,7 +352,7 @@ def generate_workfolder(NNK_name, parent_folder):
 	rand_name_out = today.strftime("%H%M%S") +"_"+ rand_name
 	
 	run_dir = os.path.join(parent_folder,"Data", NNK_name, date_today, rand_name_out)
-	web_dir = os.path.join("Data", NNK_name, date_today,rand_name_out)
+	web_dir = os.path.join(NNK_name, date_today,rand_name_out)
 	## check if the run/folder excists
 	if not os.path.exists(run_dir):
 		## if not create all the folders needed to generate the full path
@@ -355,8 +361,8 @@ def generate_workfolder(NNK_name, parent_folder):
 	else:
 		rand_name = generate_random_name()
 		rand_name_out = today.strftime("%H%M%S") +"_"+ rand_name
-		run_dir = os.path.join(parent_folder, "Data",NNK_name, date_today, rand_name_out)	
-		web_dir = os.path.join("Data", NNK_name, date_today,rand_name_out)
+		run_dir = os.path.join(parent_folder,"Data", NNK_name, date_today, rand_name_out)	
+		web_dir = os.path.join( NNK_name, date_today,rand_name_out)
 		os.makedirs(run_dir)
 
 	return(run_dir,web_dir)

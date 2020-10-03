@@ -3,14 +3,14 @@ import argparse
 import os
 import sys
 import pandas as pd
-
+import re
 
 def parse_arguments():
     my_parser = argparse.ArgumentParser(allow_abbrev=False)
 
     my_parser.add_argument('-f', nargs='?',  help='The matrix file from myVenn.py ')
 
-    my_parser.add_argument('-g',  nargs='*',
+    my_parser.add_argument('-g',  nargs='?',
                                     help='The input should be the groups of interest')
 
 
@@ -28,9 +28,17 @@ def readFile (myFile, myGroups):
             break
         
         arr = line.split("\t")
-        if (arr[1] == "group" or arr[1] in myGroups):
+
+        if (arr[1] == "group" ):
             out.write(line + "\n")
-        
+        else:
+            tmp = arr[1].split("+")
+            tmp.sort()
+            arr[1] = "+".join(tmp)
+            
+            if (arr[1] in myGroups):
+                out.write(line + "\n")
+
     file0.close()
     out.close()
 
@@ -42,9 +50,20 @@ def main():
         sys.exit("Please provide a valid file.")
 
     myFile = refArgs.get("f") ##The matrix file from myVenn.py
-    myGroups = refArgs.get("g") ##groups of interest
+    myGroup = refArgs.get("g") ##groups of interest
+    delimiters = ["X",",", ";", " "]
+    regexPattern = '|'.join(map(re.escape, delimiters))
+    myGroupTmp= re.split(regexPattern, myGroup)
+    myGroups = [x for x in myGroupTmp if x]
+    myGroups_sorted = []
 
-    readFile(myFile,myGroups)
+    for myGroup in myGroups:
+        tmp = myGroup.split("+")
+        tmp.sort()
+        myGroups_sorted.append("+".join(tmp))
+
+
+    readFile(myFile,myGroups_sorted)
 
 if __name__ == "__main__":
     main()

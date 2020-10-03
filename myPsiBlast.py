@@ -38,7 +38,7 @@ def main():
     op = refArgs.get("op") ##Gap opening penalty
     ep = refArgs.get("ep") ##gap extension penalty
     num = refArgs.get("num") ##number of iterations
-    option = refArgs.get("o") ##number of iterations
+    option = refArgs.get("o") ##input file type - msa or psiblast pssm checkpoint
 
     blastdb = "/opt/nextera/galaxy/data/blastdb/" + mydb
     

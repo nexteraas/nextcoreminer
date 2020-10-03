@@ -19,8 +19,6 @@ def parse_arguments():
     return my_parser.parse_args()
 
 
-
-
 def main():
     args = parse_arguments()
     refArgs = vars(args)
@@ -29,8 +27,8 @@ def main():
         sys.exit("Please provide a valid file.")
 
     myFile=refArgs.get("f") ##clusters of peptides
-    op = refArgs.get("op") ##Gap opening penalty
-    ep = refArgs.get("ep") ##gap extension penalty
+    op = refArgs.get("op").strip() ##Gap opening penalty
+    ep = refArgs.get("ep").strip() ##gap extension penalty
     option = refArgs.get("o") ##fasta or clustal output
     clustal = ""
     if (option == "clustal"):

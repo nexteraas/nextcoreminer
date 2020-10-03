@@ -23,7 +23,7 @@ def parse_arguments():
 def plot_Compare(df, myTitle, yLabel):
     fig,ax = plt.subplots()
     ax.plot(df.index, df['uniqCount'], color="red", marker="o",label='Unique peptides')
-    #ax.set_xlabel("year",fontsize=14)
+    
     ax.set_ylabel("Unique peptides",color="red",fontsize=14)
     # twin object for two different y-axis on the sample plot
     ax2=ax.twinx()
@@ -36,7 +36,6 @@ def plot_Compare(df, myTitle, yLabel):
 
     ax.set_title(myTitle, pad=10)
 
-    #fig.suptitle(myTitle, fontsize=20)
 
     fig.tight_layout()
     fig.savefig("CompareNumPepAndTopPep.pdf")
@@ -53,7 +52,7 @@ def main():
     myRounds = refArgs.get("rounds") ## rounds of the plots
     myTitle = refArgs.get("title") ## title of the plot
     option = refArgs.get("o") ## Top * will be selected
-    largest = int(refArgs.get("largest") ) ## **largest values of the data
+    largest = int(refArgs.get("largest").strip() ) ## **largest values of the data
     
     yLabel = ""
     
@@ -78,7 +77,7 @@ def main():
             df_RoundTop =(df_Round.nlargest(int(largest * uniqCount /100.0), ['Frequency']))
             yLabel = 'Top ' + str(largest) + '% peptides (% of total reads)'
         
-        #print (df_RoundTop.shape)
+        
         totalReadsTop = df_RoundTop['Total_Count'].sum()
 
         percTop = totalReadsTop / totalReads * 100    

@@ -16,22 +16,24 @@ def main():
 
     myFile = refArgs.get("f") 
 
-    netMHC2pan = "/home/galaxy/galaxy/tools/testing/netMHCIIpan-4.0/netMHCIIpan"
-    allele = refArgs.get("a")
+    netMHC2pan = "/home/galaxy/galaxy/tools/nextera/netMHCIIpan-4.0/netMHCIIpan"
+    allele = refArgs.get("a").strip()
 
     cmd0="cut -f 1 " + myFile + " |awk '$0 ~ /^[A-Z]+$/' > myTmp0"
-    cmd1=netMHC2pan + " -f myTmp0 -inptype 1 -a " + allele + " > myTmpOut"
+    cmd1=netMHC2pan + " -f myTmp0 -inptype 1 -a " + allele + " > myNetMHC2pan.txt"
     os.system(cmd0)
     os.system(cmd1)
-    cmd2='''gawk 'length($0)>1' myTmpOut |gawk '$0!~"---"' |grep -v "#"  > myNetMHC2pan.txt'''
+
+    cmd2='''gawk 'length($0)>1' myNetMHC2pan.txt |gawk '$0!~"---"' |grep -v "#"  > myNetMHC2pan.tmp.txt'''
     os.system(cmd2)
 
-    file0=open("myNetMHC2pan.txt")
+    file0=open("myNetMHC2pan.tmp.txt")
     outCount=open("myNetMHC2pan.BinderCount.txt" ,"w")
     count_sb=0
     count_wb_sb=0
     count_all=0
     outMotif=open("myNetMHC2pan.9mer.txt" ,"w")
+    outBinder=open("myNetMHC2pan.binder.txt" ,"w")
     while True:
         line0=file0.readline().rstrip()
         if (len(line0)==0):
@@ -44,15 +46,18 @@ def main():
                 count_sb=count_sb + 1
                 count_wb_sb=count_wb_sb + 1
                 outMotif.write(arr[4] + "\n")
+                outBinder.write(arr[2] + "\n")
             if ("WB" in arr[-1]):
                 count_wb_sb=count_wb_sb + 1
                 outMotif.write(arr[4] + "\n")
+                outBinder.write(arr[2] + "\n")
     file0.close()
     outCount.write("Total:" + str(count_wb_sb) + "\t" + "SB:" + str(count_sb) + "\t" + "WB:" + str(count_wb_sb - count_sb) + "\n")
     outCount.close()
     outMotif.close()
+    outBinder.close()
 
-    cmd3 = "rm myTmp0 myTmpOut "
+    cmd3 = "rm myTmp0 myNetMHC2pan.tmp.txt "
     os.system(cmd3)
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 #!/bin/env python3
 import argparse
 import pandas as pd
-#from scipy.spatial import distance
 import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.cluster.hierarchy as hc
@@ -73,7 +72,8 @@ def calcEUDistance (myFiles):
     first_elements = [a_tuple[1] for a_tuple in tuple_list]
     dist_matrix.columns = first_elements
     dist_matrix =  dist_matrix/max(dist_matrix.max())
-    #dist_matrix.to_csv("Eudist.txt.my", sep="\t", index = True, header=True)
+    
+    dist_matrix.to_csv("Distance_matrix.txt", sep="\t", index = True, header=True)
     return (dist_matrix)
     
     
@@ -83,8 +83,7 @@ def heatmapCluster(df,outName, colorClass):
     myColors = ["#490092","#24FF24","#FF6DB6", "#009292", "#396AB1","#DA7C30", "#3E9651", "#CC2529", "#535154", "#6B4C9A", "#922428", "#948B3D", "#984ea3", "#ff7f00", "#ffff33", "#a65628","#e1f5fe","#1A4756","#33918D","#F6D82D","#E39517","#D4342D"]
     myColumns = df.columns
     myRows = df.index
-    #myColumns = [i.split('_MY_')[0] for i in myColumns] 
-    #myRows = [i.split('_MY_')[0] for i in myRows] 
+    
     df.columns = myColumns
     df.index = myRows
     mycols = []
@@ -114,11 +113,9 @@ def heatmapCluster(df,outName, colorClass):
 
     nrows = 25
     ncols = int(np.ceil(len(refCol) / float(nrows)))
-    legend = g.ax_row_dendrogram.legend(ncol=ncols, title=colorClass,bbox_to_anchor=(5.3, 1), loc='upper left',fontsize='x-small')
+    legend = g.ax_row_dendrogram.legend(ncol=ncols, title=colorClass,bbox_to_anchor=(5.3, 1), borderaxespad=1., loc='upper left',fontsize='x-small')
     legend.get_frame().set_facecolor('none')
-    #legend.get_frame().set_linewidth(0.0)
     
-    #g.cax.set_position([0.92, .29, .03, .4])
     plt.savefig(outName + ".png",dpi=600,bbox_inches='tight')
     plt.close('all')
     
@@ -138,5 +135,6 @@ def main():
     
 if __name__ == "__main__":
     main()
+
 
 
