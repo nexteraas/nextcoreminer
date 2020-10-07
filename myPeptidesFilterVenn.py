@@ -22,6 +22,7 @@ def parse_arguments():
     my_parser.add_argument('-filterFreq', nargs='?',default="no", help='remove peptides if R1_freq < R2_freq')
     my_parser.add_argument('-filterHomo', nargs='?',default="no", help='remove peptides if they do not share homology with epitope')
     my_parser.add_argument('-filterNegCells', nargs='?',default="no", help='remove peptides if they appear in the negative panning cells')
+    my_parser.add_argument('-filterFreqPercent', nargs='?',default="0", help='remove peptides if R2_freq is increased by * percent compared to R1_freq')
     my_parser.add_argument('-negCells', nargs='?',default="",help='negative cells, e.g. R1_380 R2_380')
     my_parser.add_argument('-negCellsCounts', nargs='?',default="0", help='remove peptides if they appear in the negative panning cells with counts higher than * number')
     my_parser.add_argument('-epi',  nargs='?', default="KLLTQHFVQENY",
@@ -80,10 +81,12 @@ def get_logics(n_sets):
         yield bin(i)[2:].zfill(n_sets)
 
 
-def checkValueIncrease(arr_tmp): 
+def checkValueIncrease(arr_tmp, percent): 
     
-    res = all(i <= j for i, j in zip(arr_tmp, arr_tmp[1:])) 
-
+    res1 = all(i <= j for i, j in zip(arr_tmp, arr_tmp[1:]))  ##check if it is increase
+    res2 = all(((j -i)/i)*100 >= percent or (j -i)/i <=0  for i, j in zip(arr_tmp, arr_tmp[1:]))  ##check if it is increase by *percent
+    
+    res = res1 & res2
     return (res)
     
     
@@ -175,7 +178,7 @@ def get_rounds_exps(files,d):
     return (refD, rounds, refExps, exps)
 
 
-def merge_df(refExps, rounds, my_df,filterFreq, refD, myGroups):
+def merge_df(refExps, rounds, my_df,filterFreq, filterFreqPercent, refD, myGroups):
     df_merged = pd.DataFrame()
 
     for exp in refExps:
@@ -206,7 +209,7 @@ def merge_df(refExps, rounds, my_df,filterFreq, refD, myGroups):
        
         if (filterFreq == "yes"):
             
-            cond1 = df[freq].fillna("-1").apply(lambda row : checkValueIncrease(np.array(list(row),dtype=float)), axis = 1)  ##peptides should not be NA in all non-R0, and freq should increase 
+            cond1 = df[freq].fillna("-1").apply(lambda row : checkValueIncrease(np.array(list(row),dtype=float), filterFreqPercent), axis = 1)  ##peptides should not be NA in all non-R0, and freq should increase 
             
             df = df[cond1  ]
            
@@ -227,7 +230,7 @@ def merge_df(refExps, rounds, my_df,filterFreq, refD, myGroups):
     refLog = {}  
     if (filterFreq == "yes"):
         for myGroup in myGroups:
-            refLog["filterFreq" + "AND" + myGroup] = df_merged[df_merged[myGroup + "_Frequency"].notnull()].shape[0]
+            refLog["filterFreq" + "IncreaseBy" + str(filterFreqPercent) + "%" + "AND" + myGroup] = df_merged[df_merged[myGroup + "_Frequency"].notnull()].shape[0]
             
     return df_merged, refD, refLog
 
@@ -291,7 +294,8 @@ def main():
 
     files=refArgs.get("f") 
     myGroup = refArgs.get("g") 
-    filterFreq = refArgs.get("filterFreq") 
+    filterFreq = refArgs.get("filterFreq")
+    filterFreqPercent = float(refArgs.get("filterFreqPercent"))
     filterHomo = refArgs.get("filterHomo") 
     filterNegCells = refArgs.get("filterNegCells") 
     filterCounts = refArgs.get("filterCounts") 
@@ -324,7 +328,7 @@ def main():
 
     refD, rounds, refExps, exps = get_rounds_exps(files, d) 
 
-    df_merged, refD, refLog2 = merge_df(refExps, rounds,my_df,filterFreq, refD, myGroups )
+    df_merged, refD, refLog2 = merge_df(refExps, rounds,my_df,filterFreq, filterFreqPercent, refD, myGroups )
 
     ## output log
     outLog = open("FilterLog.txt","w")
@@ -359,6 +363,7 @@ def main():
         arr_Groups.append(comb2)
         arr_Groups.append(comb3)
 
+
     df = df_merged[arr_Groups]
     df = df.dropna(how='all',axis=0)  
     df2 = pd.read_csv("venn.txt",index_col = 0, header = 0,sep="\t",dtype = str)
@@ -382,6 +387,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 

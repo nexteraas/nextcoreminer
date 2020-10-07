@@ -12,7 +12,7 @@
     ]]></command> 
     
 <inputs>
-	<param type="data" format = "txt" name="input" label="Mafft alignment file:" help="The input should be the  multiple sequence alignment file, or PSI-BLAST checkpoint file"/>
+	<param type="data" format = "txt" name="input" label="Your input file:" help="The input should be the  multiple sequence alignment file, or PSI-BLAST checkpoint file"/>
 	
 	<param type="select" name="option" display="radio" label="Please select your input data type">
 		<option value="msa"> Multiple sequence alignment</option>

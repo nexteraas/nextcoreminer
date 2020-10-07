@@ -10,7 +10,7 @@ from math import ceil
 def parse_arguments():
     my_parser = argparse.ArgumentParser(allow_abbrev=False)
 
-    my_parser.add_argument('-f', nargs='?',  help='The clusters of peptides ')
+    my_parser.add_argument('-f', nargs='?',  help='a file containing peptides on the 1st column ')
 
     my_parser.add_argument('-epi',  nargs='?', default="",
                                     help='The input should be the epitope of interest.')

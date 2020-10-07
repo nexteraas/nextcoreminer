@@ -1,5 +1,5 @@
 
-<tool id="myPCA_generator" name="PCA UMap Louvain Generator" version="0.1.0" python_template_version="3.5">
+<tool id="myPCA_generator" name="PCA UMAP Louvain Generator" version="0.1.0" python_template_version="3.5">
     <requirements>
 	<requirement type="package" version="3">python</requirement>
     </requirements>

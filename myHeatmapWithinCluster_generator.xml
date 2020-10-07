@@ -13,7 +13,7 @@
 	<param name="colorClass" type="select" display="radio" label="Heatmap should be colored by" >
                 <option value="groups"> Groups </option>
                 <option value="rounds"> Rounds </option>
-                <option value="cellTypes"> Cell Types </option>
+                <option value="cellTypes"> Cells </option>
 	</param>
 
 	<param name="option" type="select" display="radio" label="Similarity Measurement: ">

@@ -15,8 +15,7 @@ def parse_arguments():
     my_parser = argparse.ArgumentParser(allow_abbrev=False)
 
     my_parser.add_argument('-f', nargs='*',  
-                                    help='The input should be a list of peptides with counts, '
-                                    'specificity and frequency, by default test.txt is read. ')
+                                    help='The input should be a list of peptides on the 1st column  ')
         
     return my_parser.parse_args()
 

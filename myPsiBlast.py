@@ -10,7 +10,7 @@ from math import ceil
 def parse_arguments():
     my_parser = argparse.ArgumentParser(allow_abbrev=False)
 
-    my_parser.add_argument('-f', nargs='?',  help='The mafft alignment output ')
+    my_parser.add_argument('-f', nargs='?',  help='The mafft alignment output/psiblast checkpoint file ')
 
     my_parser.add_argument('-db',  nargs='?', default="uniprot_sprot",
                                     help='Blast database ')

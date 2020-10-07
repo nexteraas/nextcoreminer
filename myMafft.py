@@ -10,7 +10,7 @@ from math import ceil
 def parse_arguments():
     my_parser = argparse.ArgumentParser(allow_abbrev=False)
 
-    my_parser.add_argument('-f', nargs='?',  help='The clusters of peptides ')
+    my_parser.add_argument('-f', nargs='?',  help='Peptide file ')
     my_parser.add_argument('-op', nargs='?',  default="1.53", help='Gap opening penalty')
     my_parser.add_argument('-ep', nargs='?',  default="0", help='Gap extension penalty')
     my_parser.add_argument('-o', nargs='?', default="fasta",help='fasta or clustal output')
@@ -26,7 +26,7 @@ def main():
     if ("f" not in refArgs):
         sys.exit("Please provide a valid file.")
 
-    myFile=refArgs.get("f") ##clusters of peptides
+    myFile=refArgs.get("f") ##peptide file
     op = refArgs.get("op").strip() ##Gap opening penalty
     ep = refArgs.get("ep").strip() ##gap extension penalty
     option = refArgs.get("o") ##fasta or clustal output

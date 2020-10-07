@@ -35,7 +35,6 @@
 
 <outputs>
 	<data name="output1" format="txt" from_work_dir="merged_matrix.txt" label="Merged Matrix TXT"/>
-	<data name="output2" format="json" from_work_dir="merged_matrix.json" label="Merged Matrix JSON"/>
 </outputs>
 
     <help><![CDATA[

@@ -3,7 +3,12 @@
 	<requirement type="package" version="3">python</requirement>
     </requirements>
     <command detect_errors="exit_code"><![CDATA[
-	    python3 '$__tool_directory__/myPeptidesFilterVenn.py' -f ${" ".join(map(str,$PepList  ))} -g '$groups' -filterFreq $filterFreq 
+	    python3 '$__tool_directory__/myPeptidesFilterVenn.py' -f ${" ".join(map(str,$PepList  ))} -g '$groups' 
+	    
+	    -filterFreq $FilterFreqPercent.filterFreq 
+	    #if $FilterFreqPercent.filterFreq=="yes":
+		-filterFreqPercent $FilterFreqPercent.filterFreqPer
+	    #end if
 
 	    -filterCounts $Counts.filterCounts
 	    #if $Counts.filterCounts=="yes":
@@ -38,23 +43,29 @@
 
 
     <inputs>
-	    <param type="data"   name="PepList" label="Please upload the whole NNK library with peptides from different rounds and cell types"  multiple="True"  />
+	<param type="data" name="PepList" label="Please upload the whole NNK library with peptides from different rounds and cell types"  multiple="True"  />
 	<param name="groups" type="text" label="Groups for venn diagram"  help="e.g. R2_R12C9 R2_R12C9mut4 R2_6F9 R2_380 R1_R12C9 R1_R12C9mut4 R1_6F9 R1_380"  />
-	<param type="select" name="filterFreq" display="radio" label="Do you want to keep only the peptides with frequency increasing with the selection rounds (i.e. R2_freq >= R1_freq)?">
-		<option value="no" > No</option>
-		<option value="yes" > Yes</option>
-	</param>
 
 	<conditional name="Counts">
 		<param type="select" name="filterCounts" display="radio" label="Do you want to keep only the peptides with counts higher than e.g. 1 ?" >
-			 <option value="no" > No</option>
-		 	 <option value="yes" > Yes</option>
+			<option value="no" > No</option>
+			<option value="yes" > Yes</option>
 		</param>
-       		<when value="yes">
-			<param name="counts" type="text" value="0" label="Insert your number:" help="Note: 0 indicates all the peptides will be included."/>
-		</when>		
-	
+		<when value="yes">
+			<param name="counts" type="text" value="0" label="Set your counts:" help="Note: 0 indicates all the peptides will be included."/>
+		</when>
 	</conditional>
+
+	<conditional name="FilterFreqPercent">
+		<param type="select" name="filterFreq" display="radio" label="Do you want to keep only the peptides with frequency increasing by XX percent with the selection rounds?">
+			<option value="no" > No</option>
+			<option value="yes" > Yes</option>
+		</param>
+		<when value="yes">
+			<param name="filterFreqPer" type="text" value="0" label="Set your minimum percentage:" help="e.g. 10 indicates R2_freq is increased by at least 10% compared to R1_freq." /> 
+		</when>
+	</conditional>
+
 
 	<conditional name="Homology">
 		<param type="select" name="filterHomo" display="radio" label="Do you want to keep only the peptides sharing homology with your epitope?"   >
@@ -71,12 +82,12 @@
 					<option value="Similarity"> Similarity</option>
 				</param>
 				<when value="Identity">
-					<param name="identity" type="text" value="80" label="% identity cut-off for homology:" />
+					<param name="identity" type="text" value="80" label="Set the minimum % identity for homology:" />
 					<param name="num_overlap" type="text" value="1" label="Set the minimum number of overlap AAs for the alignment:"/>
 
 				</when>
 				<when value="Similarity">
-					<param name="similarity" type="text" value="80" label="% similarity cut-off for homology:" />
+					<param name="similarity" type="text" value="80" label="Set the minimum % similarity for homology:" />
 					<param name="num_overlap" type="text" value="1" label="Set the minimum number of overlap AAs for the alignment:"/>
 
 				</when>
@@ -94,7 +105,7 @@
 
 		<when value="yes">
 			<param name="negCells" type="text" label="Insert your negative cell types:" help="e.g. R1_380 R2_380. Note: cell type is written with whitespace, comma or semicolon as delimiters (all 3 or a mix of them work)." />
-			<param name="negCellsCounts" type="text" value="0" label="Insert the counts threshold in negative cell types:" help="Note: peptides with counts higher than a certain number in the negative cells will be removed. i.e. 0 indicates all the peptides that appear in the negative cells will be removed. 1 indicates peptides that appear in the negative cells, and counts are higher than 1 wil be removed." />
+			<param name="negCellsCounts" type="text" value="0" label="Set the counts threshold in negative cell types:" help="Note: peptides with counts higher than a certain number in the negative cells will be removed. i.e. 0 indicates all the peptides that appear in the negative cells will be removed. 1 indicates peptides that appear in the negative cells, AND counts are higher than 1 will be removed." />
 		</when>
 
 	</conditional>

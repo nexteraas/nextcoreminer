@@ -11,13 +11,12 @@ def parse_arguments():
     my_parser = argparse.ArgumentParser(allow_abbrev=False)
 
     my_parser.add_argument('-f', nargs='*', 
-                                    help='The input should be a list of peptides with counts, '
-                                    'specificity and frequency. By default test.txt is read. ')
+                                    help='one or multiple files containing peptides on the 1st column. ')
     my_parser.add_argument('-pos',  nargs='?', 
                                     help='The input should be lists of AA positions. '
                                     'If no -p option, then all the AAs are included.')
     my_parser.add_argument('-titles',  nargs='*',default="", 
-                                    help='The title of the logo plot. ')
+                                    help='The title of each logo plot. ')
     
     my_parser.add_argument('-type', nargs='?',  default="logo",
                                     help="logo or ice-logo")
