@@ -1,5 +1,5 @@
 
-<tool id="myPepFromVenn_finder" name="Peptides from Venn Finder" version="0.1.0" python_template_version="3.5">
+<tool id="myPepFromVenn_finder" name="Venn Groups Peptide Selector" version="0.1.0" python_template_version="3.5">
     <requirements>
 	<requirement type="package" version="3">python</requirement>
     </requirements>
@@ -9,7 +9,7 @@
     ]]></command> 
     
 <inputs>
-	<param type="data" format = "txt" name="input" label="Matrix file from 'Peptides Filter and Venn Generator':" />
+	<param type="data" format = "txt" name="input" label="Matrix file from 'Peptide Filter and Venn Diagram on Peptide Extraction':" />
 	<param name="groups" type="text" value="" label="Insert your intersection groups:"  help="e.g. R2_R12C9+R2_6F9 R2_R12C9mut4+R2_6F9. Note: group is written with whitespace, comma or semicolon as delimiters (all 3 or a mix of them work)."  />
 </inputs>    
 

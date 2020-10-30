@@ -1,5 +1,5 @@
 
-<tool id="myPCA_generator" name="PCA UMAP Louvain Generator" version="0.1.0" python_template_version="3.5">
+<tool id="myPCA_generator" name="PCA, UMAP plot, and Louvain Cluster" version="0.1.0" python_template_version="3.5">
     <requirements>
 	<requirement type="package" version="3">python</requirement>
     </requirements>
@@ -15,7 +15,7 @@
 
     
 <inputs>
-	<param type="data" format = "txt" name="input" label="Matrix file from 'Peptides Filter and Venn Generator':"/>
+	<param type="data" format = "txt" name="input" label="Matrix file from 'Peptide Filter and Venn Diagram on Peptide Extraction':"/>
 
 	<param name="colorClass" type="select" display="checkboxes" multiple="True" label="PCA UMAP (tSNE) should be colored by:" > 
 		<option value="groups"> Groups </option>

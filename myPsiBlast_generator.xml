@@ -1,5 +1,5 @@
 
-<tool id="myPsiBlast_generator" name="PSI-BLAST searching for databases" version="0.1.0" python_template_version="3.5">
+<tool id="myPsiBlast_generator" name="PsiBlast Database Search" version="0.1.0" python_template_version="3.5">
     <requirements>
 	<requirement type="package" version="3">python</requirement>
     </requirements>

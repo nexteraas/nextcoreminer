@@ -1,5 +1,5 @@
 
-<tool id="myVenn_generator" name="Venn Generator" version="0.1.0" python_template_version="3.5">
+<tool id="myVenn_generator" name="Venn Diagram with optional input" version="0.1.0" python_template_version="3.5">
     <requirements>
 	<requirement type="package" version="3">python</requirement>
     </requirements>

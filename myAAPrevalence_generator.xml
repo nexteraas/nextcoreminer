@@ -28,7 +28,7 @@
     ]]></command> 
     
 <inputs>
-	<repeat name="series" title="Peptides files (max. 9)">
+	<repeat name="series" title="Peptides lists (max. 9)">
     		<param name="input" type="data" format="txt" label="Dataset" help="The input can be a matrix file, but the 1st column should be peptides"/>
 		<param name="titles" type="text" data_ref="input" label="Insert title of the plot if it is needed:"/>
 		<conditional name="colorSelect">

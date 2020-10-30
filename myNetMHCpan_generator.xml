@@ -1,15 +1,15 @@
 
-<tool id="myNetMHCpan_generator" name="NetMHC2pan 4.0 Generator" version="0.1.0" python_template_version="3.5">
+<tool id="myNetMHCpan_generator" name="NetMHCIIpan-4.0" version="0.1.0" python_template_version="3.5">
     <requirements>
 	<requirement type="package" version="3">python</requirement>
     </requirements>
    
     <command detect_errors="exit_code"><![CDATA[
-	    python3 '$__tool_directory__/myNetMHC2pan.py' -f '$input'   -a $allele
+	    python3 '$__tool_directory__/myNetMHCpan.py' -f '$input'   -a $allele
 	]]></command> 
     
 <inputs>
-	<param type="data" format = "txt" name="input" label="Peptide"  help="The input can be a matrix file, but the 1st column should be peptides"/>
+	<param type="data" format = "txt" name="input" label="Peptide list:"  help="The input can be a matrix file, but the 1st column should be peptides"/>
 	<param name="allele" type="text" value="" label="Insert your allele:"  help="e.g. HLA-DPA10103-DPB10401 for DP4, HLA-DQA10501-DQB10201 for DQ2.5"  />
 </inputs>    
 

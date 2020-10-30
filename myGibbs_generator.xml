@@ -1,5 +1,5 @@
 
-<tool id="myGibbs_generator" name="GibbsCluster 2.0 Generator" version="0.1.0" python_template_version="3.5">
+<tool id="myGibbs_generator" name="GibbsCluster-2.0" version="0.1.0" python_template_version="3.5">
     <requirements>
 	<requirement type="package" version="3">python</requirement>
     </requirements>
@@ -9,7 +9,7 @@
 	]]></command> 
     
 <inputs>
-	<param type="data" format = "txt" name="input" label="Peptide"  help="The input can be a matrix file, but the 1st column should be peptides"/>
+	<param type="data" format = "txt" name="input" label="Peptide list:"  help="The input can be a matrix file, but the 1st column should be peptides"/>
 	<param name="gibs_cluster" type="text" value="1-15" label="Insert number of clusters:"  help="e.g. as single number [15] or interval [1-15]. In the second case, the method will suggest the optimal number of clusters it found in the data, given the parameter configuration of the job. Maximum number of clusters: 15"  />
 </inputs>    
 

@@ -1,4 +1,4 @@
-<tool id="merge_matrix_1" name="Complie Results Matrix" version="0.1.0" python_template_version="3.5">
+<tool id="merge_matrix" name="Compile Table View Link" version="0.1.0" python_template_version="3.5">
    <description>Take peptide outputs and merge ontop matrix</description>
     <requirements>
     
@@ -7,7 +7,7 @@
 	    python3 '$__tool_directory__/data_run_colllector.py' 
 	    -d ${" ".join(map(str,$datain))}
 	    -p $processes
-	    -t '/opt/nextera/galaxy/nextera-peptide-viewer/'
+	    -t '/opt/nextera/galaxy/nextera-new/'
 
     ]]></command>
     <inputs>

@@ -45,7 +45,7 @@ def generate_hyperlink(web_folder):
  		of.write("<title>Nextera Data table hyperlink</title>")
  		of.write("</head>")
  		of.write("<body>")
- 		of.write("<a href=\"https://external-nextera-view.intomics.com/"+web_folder+"/\" target=\"_blank\">Go to data location</a>")
+ 		of.write("<a href=\"https://external-nextera-view.intomics.com/#/"+web_folder+"/\" target=\"_blank\">Go to data location</a>")
  		of.write("</body>")
  		of.write("</html>")
 

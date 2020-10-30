@@ -1,5 +1,5 @@
 
-<tool id="myHeatmapWithinCluster_generator" name="Heatmap Within Cluster Generator" version="0.1.0" python_template_version="3.5">
+<tool id="myHeatmapWithinCluster_generator" name="Peptide Distances Within Cluster" version="0.1.0" python_template_version="3.5">
     <requirements>
 	<requirement type="package" version="3">python</requirement>
     </requirements>
@@ -9,7 +9,7 @@
     ]]></command> 
     
 <inputs>
-	<param type="data" format = "txt" name="input" label="Input file with peptides and groups:"/>
+	<param type="data" format = "txt" name="input" label="Peptide list with groups, rounds and cells info:"/>
 	<param name="colorClass" type="select" display="radio" label="Heatmap should be colored by" >
                 <option value="groups"> Groups </option>
                 <option value="rounds"> Rounds </option>

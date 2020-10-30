@@ -1,5 +1,5 @@
 
-<tool id="myClustersPeps_finder" name="Clusters of Peptides Finder" version="0.1.0" python_template_version="3.5">
+<tool id="myClustersPeps_finder" name="Cluster Home of Peptides Finder" version="0.1.0" python_template_version="3.5">
     <requirements>
 	<requirement type="package" version="3">python</requirement>
     </requirements>
