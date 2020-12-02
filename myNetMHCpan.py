@@ -16,7 +16,7 @@ def main():
 
     myFile = refArgs.get("f") 
 
-    netMHC2pan = "/home/galaxy/galaxy/tools/nextera/netMHCIIpan-4.0/netMHCIIpan"
+    netMHC2pan = "/home/Nextera/galaxy/tools/nextera/netMHCIIpan-4.0/netMHCIIpan"
     allele = refArgs.get("a").strip()
 
     cmd0="cut -f 1 " + myFile + " |awk '$0 ~ /^[A-Z]+$/' > myTmp0"
