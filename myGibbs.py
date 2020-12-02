@@ -18,7 +18,7 @@ def main():
 
     myFile = refArgs.get("f") 
 
-    gibbs = "/home/galaxy/galaxy/tools/nextera/gibbscluster-2.0/GibbsCluster-2.0e_SA.pl"
+    gibbs = "/home/Nextera/galaxy/tools/nextera/gibbscluster-2.0/GibbsCluster-2.0e_SA.pl"
     gibs_cluster = refArgs.get("g").strip()
 
     cmd0="cut -f 1 " + myFile + " |awk '$0 ~ /^[A-Z]+$/' > myTmp0"
